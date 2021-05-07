@@ -1,2 +1,2 @@
-export * from './common'
-export * from './smc'
+export * from './common';
+export * from './smc';
