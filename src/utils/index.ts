@@ -31,4 +31,5 @@ const removeTrailingZeros = (value: any) => {
   return after ? after : '0';
 };
 
-export { cellValue };
+// export { cellValue };
+export const Utils = { cellValue };

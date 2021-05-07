@@ -1,6 +1,6 @@
 // import KardiaClient from "kardia-js-sdk";
 
-class KaiDexTrading {
+export class KaiDexTrading {
   // private _kardiaClient: KardiaClient;
   // constructor(client: KardiaClient) {
   //     this._kardiaClient = client

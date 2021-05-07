@@ -1,4 +1,4 @@
-// import { calculateKAIFee } from '../src/service';
+// import { calculateKAIFee } from '../src/services';
 
 describe('Swap', () => {
   it('Swap', async () => {

@@ -1,5 +1,5 @@
 // import KardiaClient from 'kardia-js-sdk'
-import KaiDexTrading from './trading';
+// import { KaiDexTrading } from './services';
 // interface KardiaClientProps {
 //     endpoint: string;
 // }
@@ -14,4 +14,6 @@ class KaiDexClient {
 }
 
 export default KaiDexClient;
-export { KaiDexTrading };
+// export { KaiDexTrading };
+export * from './services';
+export * from './utils';

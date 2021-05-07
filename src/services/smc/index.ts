@@ -1,2 +1,2 @@
-export * from './route-swap';
+export * from './router';
 export * from './smart-contract';

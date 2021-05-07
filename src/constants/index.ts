@@ -1,5 +1,5 @@
-import ROUTE_SWAP from './abi/route-swap.json';
-import REWARDS_ABI from './abi/reward.json';
+import ROUTER from './abi/router.json';
+import REWARDS from './abi/reward.json';
 
 export const DEADLINE_DEFAULT = 5; // 5 mins
 
@@ -10,11 +10,11 @@ export const methodNames = {
 };
 
 export const abiJson = {
-  ROUTE_SWAP: ROUTE_SWAP,
-  REWARDS_ABI: REWARDS_ABI,
+  ROUTER: ROUTER,
+  REWARDS: REWARDS,
 };
 
 export const smcAddress = {
-  ROUTE_SWAP: '0x581e5fdB8114023FaEF21666910B3b9b4e612dDc',
-  REWARD: '0x125A43340936520691dF37537EF646d9ab380424',
+  ROUTER: '0x581e5fdB8114023FaEF21666910B3b9b4e612dDc',
+  REWARDS: '0x125A43340936520691dF37537EF646d9ab380424',
 };

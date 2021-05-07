@@ -1,4 +1,4 @@
-import { kardiaContract } from '../../kardia-tool';
+import { kardiaContract } from '../kardia-client';
 
 export const smcCallData = async ({
   abi,

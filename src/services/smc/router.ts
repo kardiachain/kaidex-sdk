@@ -4,8 +4,8 @@ import JSBI from 'jsbi';
 
 const getAmountsOut = async (amountIn: string, path: string[]) => {
   const result = await smcCallData({
-    abi: abiJson.ROUTE_SWAP,
-    contractAddr: process.env.REACT_APP_ROUTE_SMC_ADDRESS as string,
+    abi: abiJson.ROUTER,
+    contractAddr: smcAddress.ROUTER,
     methodName: methodNames.GET_AMOUNTS_OUT,
     params: [amountIn, path],
   });
@@ -17,12 +17,15 @@ const calculateKAIFee = async (
   tokenAddr: string
 ): Promise<string> => {
   const result = await smcCallData({
-    abi: abiJson.REWARDS_ABI,
-    contractAddr: smcAddress.REWARD,
+    abi: abiJson.REWARDS,
+    contractAddr: smcAddress.REWARDS,
     methodName: methodNames.CALCULATE_KAI_FEE,
     params: [amountIn, tokenAddr],
   });
   return JSBI.BigInt(result).toString();
 };
 
-export { getAmountsOut, calculateKAIFee };
+export const RouterService = {
+  getAmountsOut,
+  calculateKAIFee,
+};
