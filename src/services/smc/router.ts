@@ -1,11 +1,11 @@
 import { smcCallData } from './smart-contract';
-import { abiJson, methodNames, smcAddress } from '../../constants';
+import { abiJson, methodNames, smcAddresses } from '../../constants';
 import JSBI from 'jsbi';
 
 const getAmountsOut = async (amountIn: string, path: string[]) => {
   const result = await smcCallData({
     abi: abiJson.ROUTER,
-    contractAddr: smcAddress.ROUTER,
+    contractAddr: smcAddresses.ROUTER,
     methodName: methodNames.GET_AMOUNTS_OUT,
     params: [amountIn, path],
   });
@@ -18,7 +18,7 @@ const calculateKAIFee = async (
 ): Promise<string> => {
   const result = await smcCallData({
     abi: abiJson.REWARDS,
-    contractAddr: smcAddress.REWARDS,
+    contractAddr: smcAddresses.REWARDS,
     methodName: methodNames.CALCULATE_KAI_FEE,
     params: [amountIn, tokenAddr],
   });

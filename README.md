@@ -71,7 +71,7 @@ Two actions are added by default:
 Please see the main `tsdx` [optimizations docs](https://github.com/palmerhq/tsdx#optimizations). In particular, know that you can take advantage of development-only optimizations:
 
 ```js
-// ./types/index.d.ts
+// ./types/index.ts
 declare var __DEV__: boolean;
 
 // inside your code...

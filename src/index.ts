@@ -1,19 +1,18 @@
-// import KardiaClient from 'kardia-js-sdk'
-// import { KaiDexTrading } from './services';
-// interface KardiaClientProps {
-//     endpoint: string;
-// }
-class KaiDexClient {
-  // private _kardiaClient: KardiaClient;
-  // public kaiDexSwap: KaiDexTrading;
+import { AbstractKaiDexService } from './entities';
+import { FactoryService } from './services';
 
-  constructor() {
-    // this._kardiaClient = new KardiaClient({endpoint: endpoint})
-    // this.kaiDexSwap = new KaiDexTrading(this._kardiaClient)
+class KaiDEXClient extends AbstractKaiDexService {
+  public factory: FactoryService;
+
+  constructor(props: KaiDEXOptions) {
+    super(props);
+
+    this.factory = new FactoryService({
+      abi: this.abiJSON.factory,
+      smcAddress: this.smcAddresses.factory,
+    });
   }
 }
 
-export default KaiDexClient;
-// export { KaiDexTrading };
-export * from './services';
 export * from './utils';
+export default KaiDEXClient;
