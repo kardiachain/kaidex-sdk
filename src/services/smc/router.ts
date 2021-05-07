@@ -1,31 +1,140 @@
-import { smcCallData } from './smart-contract';
-import { abiJson, methodNames, smcAddresses } from '../../constants';
+import { methodNames } from '../../constants';
 import JSBI from 'jsbi';
+import { AbstractSmcService } from '../../entities';
 
-const getAmountsOut = async (amountIn: string, path: string[]) => {
-  const result = await smcCallData({
-    abi: abiJson.ROUTER,
-    contractAddr: smcAddresses.ROUTER,
-    methodName: methodNames.GET_AMOUNTS_OUT,
-    params: [amountIn, path],
-  });
-  return result && result.length > 0 ? JSBI.BigInt(result[1]).toString() : '';
-};
+export class RouterService extends AbstractSmcService {
+  async getReserves(tokenA: string, tokenB: string): Promise<PooledTokens> {
+    if (!tokenA.trim() || !tokenB.trim()) throw new Error('Invalid token!');
 
-const calculateKAIFee = async (
-  amountIn: string,
-  tokenAddr: string
-): Promise<string> => {
-  const result = await smcCallData({
-    abi: abiJson.REWARDS,
-    contractAddr: smcAddresses.REWARDS,
-    methodName: methodNames.CALCULATE_KAI_FEE,
-    params: [amountIn, tokenAddr],
-  });
-  return JSBI.BigInt(result).toString();
-};
+    const result = await this.smcCallData({
+      abi: this.abi,
+      contractAddr: this.smcAddress,
+      methodName: methodNames.GET_RESERVES,
+      params: [tokenA, tokenB],
+    });
 
-export const RouterService = {
-  getAmountsOut,
-  calculateKAIFee,
-};
+    return { tokenA: result['reserveA'], tokenB: result['reserveB'] };
+  }
+
+  async addLiquidity(params: SMCParams.AddLiquidity) {
+    const {
+      amountADesired,
+      amountBDesired,
+      amountAMin,
+      amountBMin,
+      tokenA,
+      tokenB,
+      address,
+      deadline,
+    } = params;
+
+    return this.invokeSMC({
+      abi: this.abi,
+      smcAddr: this.smcAddress,
+      methodName: methodNames.ADD_LIQUIDITY,
+      params: [
+        tokenA,
+        tokenB,
+        amountADesired,
+        amountBDesired,
+        amountAMin,
+        amountBMin,
+        address,
+        deadline,
+      ],
+    });
+  }
+
+  async addLiquidityKAI({
+    tokenAddress,
+    amountTokenMin,
+    amountTokenDesired,
+    amountKAI,
+    amountKAIMin,
+    address,
+    deadline,
+  }: SMCParams.AddLiquidityKAI) {
+    return this.invokeSMC({
+      abi: this.abi,
+      amount: amountKAI,
+      smcAddr: this.smcAddress,
+      methodName: methodNames.ADD_LIQUIDITY_KAI,
+      params: [
+        tokenAddress,
+        amountTokenDesired,
+        amountTokenMin,
+        amountKAIMin,
+        address,
+        deadline,
+      ],
+    });
+  }
+
+  async removeLiquidity({
+    tokenAddressA,
+    tokenAddressB,
+    liquidity,
+    amountAMin,
+    amountBMin,
+    walletAddress,
+    deadline,
+  }: SMCParams.RemoveLiquidity) {
+    return this.invokeSMC({
+      abi: this.abi,
+      smcAddr: this.smcAddress,
+      methodName: methodNames.REMOVE_LIQUIDITY,
+      params: [
+        tokenAddressA,
+        tokenAddressB,
+        liquidity,
+        amountAMin,
+        amountBMin,
+        walletAddress,
+        deadline,
+      ],
+    });
+  }
+
+  async removeLiquidityKAI({
+    tokenAddress,
+    amountTokenMin,
+    liquidity,
+    amountKAIMin,
+    walletAddress,
+    deadline,
+  }: SMCParams.RemoveLiquidityKAI) {
+    return this.invokeSMC({
+      abi: this.abi,
+      smcAddr: this.smcAddress,
+      methodName: methodNames.REMOVE_LIQUIDITY_KAI,
+      params: [
+        tokenAddress,
+        liquidity,
+        amountTokenMin,
+        amountKAIMin,
+        walletAddress,
+        deadline,
+      ],
+    });
+  }
+
+  swapTokens = async ({ methodName, args, amount }: SMCParams.CallParams) => {
+    return this.invokeSMC({
+      abi: this.abi,
+      smcAddr: this.smcAddress,
+      methodName: methodName,
+      params: args,
+      amount: amount ? amount : 0,
+    });
+  };
+
+  async getAmountsOut(amountIn: string, path: string[]): Promise<string> {
+    const result = await this.smcCallData({
+      abi: this.abi,
+      contractAddr: this.smcAddress,
+      methodName: methodNames.GET_AMOUNTS_OUT,
+      params: [amountIn, path],
+    });
+    return result && result.length > 0 ? JSBI.BigInt(result[1]).toString() : '';
+  }
+}

@@ -5,17 +5,18 @@ import {
   smcAddresses as defaultAddresses,
 } from '../constants';
 
-
 export abstract class AbstractKaiDexService {
   protected abiJSON: Required<ABIS>;
   protected smcAddresses: Required<SmcAddresses>;
-  protected _kardiaClient: KardiaClient;
+  protected kardiaClient: KardiaClient;
 
-  constructor(options: KaiDEXOptions = {
-    abis: {},
-    smcAddresses: {},
-    rpcEndpoint: ''
-  }) {
+  protected constructor(
+    options: KaiDEXOptions = {
+      abis: {},
+      smcAddresses: {},
+      rpcEndpoint: '',
+    }
+  ) {
     const { abis, rpcEndpoint, smcAddresses } = options;
 
     this.abiJSON = {
@@ -32,17 +33,18 @@ export abstract class AbstractKaiDexService {
       factory:
         (smcAddresses && smcAddresses.factory) || defaultAddresses.FACTORY,
       limitOrder:
-        (smcAddresses && smcAddresses.limitOrder) || defaultAddresses.LIMIT_ORDER,
+        (smcAddresses && smcAddresses.limitOrder) ||
+        defaultAddresses.LIMIT_ORDER,
       kaiSwapper:
-        (smcAddresses && smcAddresses.kaiSwapper) || defaultAddresses.KAI_SWAPPER,
+        (smcAddresses && smcAddresses.kaiSwapper) ||
+        defaultAddresses.KAI_SWAPPER,
       rewards:
         (smcAddresses && smcAddresses.rewards) || defaultAddresses.REWARDS,
       wkai: (smcAddresses && smcAddresses.wkai) || defaultAddresses.WKAI,
     };
 
-    this._kardiaClient = new KardiaClient({
+    this.kardiaClient = new KardiaClient({
       endpoint: rpcEndpoint || defaultEndpoint,
     });
   }
 }
-

@@ -1,19 +1,11 @@
-import { smcCallData } from './';
 import { methodNames } from '../../constants';
+import { AbstractSmcService } from '../../entities';
 
-export class FactoryService {
-  readonly abi: any;
-  readonly smcAddress: string;
-
-  constructor({ abi, smcAddress }: { abi: any; smcAddress: string }) {
-    this.abi = abi;
-    this.smcAddress = smcAddress;
-  }
-
+export class FactoryService extends AbstractSmcService {
   getPair(tokenA: string, tokenB: string) {
-    if (!tokenA.trim() || !tokenB.trim()) throw new Error('Invalid token!')
+    if (!tokenA.trim() || !tokenB.trim()) throw new Error('Invalid token!');
 
-    return smcCallData({
+    return this.smcCallData({
       abi: this.abi,
       contractAddr: this.smcAddress,
       methodName: methodNames.GET_PAIR,
