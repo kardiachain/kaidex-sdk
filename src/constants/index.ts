@@ -27,4 +27,6 @@ export const smcAddresses = {
 
 export const endpoint = 'https://dex-1.kardiachain.io';
 
+export const DEFAULT_APPROVE_AMOUNT = '1000000000000000000000000000000';
+
 export * from './methodNames';

@@ -3,7 +3,10 @@ import JSBI from 'jsbi';
 import { AbstractSmcService } from '../../entities';
 
 export class RouterService extends AbstractSmcService {
-  async getReserves(tokenA: string, tokenB: string): Promise<PooledTokens> {
+  getReserves = async (
+    tokenA: string,
+    tokenB: string
+  ): Promise<PooledTokens> => {
     if (!tokenA.trim() || !tokenB.trim()) throw new Error('Invalid token!');
 
     const result = await this.smcCallData({
@@ -14,20 +17,18 @@ export class RouterService extends AbstractSmcService {
     });
 
     return { tokenA: result['reserveA'], tokenB: result['reserveB'] };
-  }
+  };
 
-  async addLiquidity(params: SMCParams.AddLiquidity) {
-    const {
-      amountADesired,
-      amountBDesired,
-      amountAMin,
-      amountBMin,
-      tokenA,
-      tokenB,
-      address,
-      deadline,
-    } = params;
-
+  addLiquidity = ({
+    amountADesired,
+    amountBDesired,
+    amountAMin,
+    amountBMin,
+    tokenA,
+    tokenB,
+    address,
+    deadline,
+  }: SMCParams.AddLiquidity) => {
     return this.invokeSMC({
       abi: this.abi,
       smcAddr: this.smcAddress,
@@ -43,9 +44,9 @@ export class RouterService extends AbstractSmcService {
         deadline,
       ],
     });
-  }
+  };
 
-  async addLiquidityKAI({
+  addLiquidityKAI = ({
     tokenAddress,
     amountTokenMin,
     amountTokenDesired,
@@ -53,7 +54,7 @@ export class RouterService extends AbstractSmcService {
     amountKAIMin,
     address,
     deadline,
-  }: SMCParams.AddLiquidityKAI) {
+  }: SMCParams.AddLiquidityKAI) => {
     return this.invokeSMC({
       abi: this.abi,
       amount: amountKAI,
@@ -68,9 +69,9 @@ export class RouterService extends AbstractSmcService {
         deadline,
       ],
     });
-  }
+  };
 
-  async removeLiquidity({
+  removeLiquidity = ({
     tokenAddressA,
     tokenAddressB,
     liquidity,
@@ -78,7 +79,7 @@ export class RouterService extends AbstractSmcService {
     amountBMin,
     walletAddress,
     deadline,
-  }: SMCParams.RemoveLiquidity) {
+  }: SMCParams.RemoveLiquidity) => {
     return this.invokeSMC({
       abi: this.abi,
       smcAddr: this.smcAddress,
@@ -93,16 +94,16 @@ export class RouterService extends AbstractSmcService {
         deadline,
       ],
     });
-  }
+  };
 
-  async removeLiquidityKAI({
+  removeLiquidityKAI = ({
     tokenAddress,
     amountTokenMin,
     liquidity,
     amountKAIMin,
     walletAddress,
     deadline,
-  }: SMCParams.RemoveLiquidityKAI) {
+  }: SMCParams.RemoveLiquidityKAI) => {
     return this.invokeSMC({
       abi: this.abi,
       smcAddr: this.smcAddress,
@@ -116,9 +117,9 @@ export class RouterService extends AbstractSmcService {
         deadline,
       ],
     });
-  }
+  };
 
-  swapTokens = async ({ methodName, args, amount }: SMCParams.CallParams) => {
+  swapTokens = ({ methodName, args, amount }: SMCParams.CallParams) => {
     return this.invokeSMC({
       abi: this.abi,
       smcAddr: this.smcAddress,
@@ -128,7 +129,7 @@ export class RouterService extends AbstractSmcService {
     });
   };
 
-  async getAmountsOut(amountIn: string, path: string[]): Promise<string> {
+  getAmountsOut = async (amountIn: string, path: string[]): Promise<string> => {
     const result = await this.smcCallData({
       abi: this.abi,
       contractAddr: this.smcAddress,
@@ -136,5 +137,5 @@ export class RouterService extends AbstractSmcService {
       params: [amountIn, path],
     });
     return result && result.length > 0 ? JSBI.BigInt(result[1]).toString() : '';
-  }
+  };
 }

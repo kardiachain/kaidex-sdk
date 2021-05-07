@@ -1,10 +1,11 @@
 import KardiaClient, {
   KAIChain,
   KardiaAccount,
-  KardiaTransaction
+  KardiaTransaction,
+  KRC20,
 } from 'kardia-js-sdk';
 
-import KardiaContract from "kardia-js-sdk/dist/smc";
+import KardiaContract from 'kardia-js-sdk/dist/smc';
 
 export abstract class AbstractSmcService {
   readonly abi: any;
@@ -14,6 +15,7 @@ export abstract class AbstractSmcService {
   readonly kardiaContract: KardiaContract;
   readonly kardiaTransaction: KardiaTransaction;
   readonly kardiaChain: KAIChain;
+  readonly kardiaKrc20: KRC20;
 
   constructor({
     abi,
@@ -31,6 +33,7 @@ export abstract class AbstractSmcService {
     this.kardiaContract = client.contract;
     this.kardiaTransaction = client.transaction;
     this.kardiaChain = client.kaiChain;
+    this.kardiaKrc20 = client.krc20;
   }
 
   async smcCallData({
@@ -55,7 +58,7 @@ export abstract class AbstractSmcService {
     methodName,
     params,
     amount = 0,
-    gasLimit = 10000000,  //todo remove hardcode
+    gasLimit = 10000000, //todo remove hardcode
     gasPrice = 1,
   }: {
     abi: any;
