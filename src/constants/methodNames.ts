@@ -1,5 +1,8 @@
 export const methodNames = {
+  //Factory
   GET_PAIR: 'getPair',
+
+  //Router
   GET_RESERVES: 'getReserves',
   GET_AMOUNTS_OUT: 'getAmountsOut',
   GET_TOTAL_KAI_AMOUNTS_IN: 'getTotalKAIAmountsIn',
@@ -14,8 +17,14 @@ export const methodNames = {
   SWAP_TOKENS_FOR_EXACT_KAI: 'swapTokensForExactKAI',
   SWAP_KAI_FOR_EXACT_TOKENS: 'swapKAIForExactTokens',
 
+  //KRC20
   APPROVE: 'approve',
   ALLOWANCE: 'allowance',
   BALANCE_OF: 'balanceOf',
   TOTAL_SUPPLY: 'totalSupply',
+
+  //Limit order
+  ORDER_INPUT_KAI: 'orderInputKAI',
+  ORDER_INPUT_TOKENS: 'orderInputTokens',
+  CANCEL_ORDER: 'cancelOrder',
 };

@@ -24,8 +24,8 @@ export abstract class AbstractKaiDexService {
       factory: (abis && abis.factory) || abiJson.FACTORY,
       krc20: (abis && abis.krc20) || abiJson.KRC20,
       pair: (abis && abis.pair) || abiJson.PAIR,
-      rewards: (abis && abis.rewards) || abiJson.REWARDS,
-      wkai: (abis && abis.wkai) || abiJson.WKAI,
+      limitOrder: (abis && abis.limitOrder) || abiJson.LIMIT_ORDER,
+      // wkai: (abis && abis.wkai) || abiJson.WKAI,
     };
 
     this.smcAddresses = {
@@ -35,11 +35,9 @@ export abstract class AbstractKaiDexService {
       limitOrder:
         (smcAddresses && smcAddresses.limitOrder) ||
         defaultAddresses.LIMIT_ORDER,
-      kaiSwapper:
-        (smcAddresses && smcAddresses.kaiSwapper) ||
-        defaultAddresses.KAI_SWAPPER,
-      rewards:
-        (smcAddresses && smcAddresses.rewards) || defaultAddresses.REWARDS,
+      // kaiSwapper:
+      //   (smcAddresses && smcAddresses.kaiSwapper) ||
+      //   defaultAddresses.KAI_SWAPPER,
       wkai: (smcAddresses && smcAddresses.wkai) || defaultAddresses.WKAI,
     };
 
