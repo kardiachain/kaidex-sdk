@@ -1,6 +1,6 @@
 interface Account {
-  publickey: string;
-  privatekey: string;
+  publicKey: string;
+  privateKey: string;
 }
 
 interface Pair {

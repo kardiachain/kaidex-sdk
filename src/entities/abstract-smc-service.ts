@@ -5,6 +5,8 @@ import KardiaClient, {
   KRC20,
 } from 'kardia-js-sdk';
 
+import { DEFAULT_GAS_LIMIT, DEFAULT_GAS_PRICE } from '../constants';
+
 import KardiaContract from 'kardia-js-sdk/dist/smc';
 
 export abstract class AbstractSmcService {
@@ -36,7 +38,7 @@ export abstract class AbstractSmcService {
     this.kardiaKrc20 = client.krc20;
   }
 
-  async smcCallData({
+  smcCallData = async ({
     abi,
     contractAddr,
     methodName,
@@ -46,29 +48,21 @@ export abstract class AbstractSmcService {
     contractAddr: string;
     methodName: string;
     params: any[];
-  }) {
+  }) => {
     this.kardiaContract.updateAbi(abi);
     const invoke = await this.kardiaContract.invokeContract(methodName, params);
     return await invoke.call(contractAddr, {}, 'latest');
-  }
+  };
 
-  async invokeSMC({
+  invokeSMC = async ({
     abi,
-    smcAddr,
+    contractAddr,
     methodName,
     params,
-    amount = 0,
-    gasLimit = 10000000, //todo remove hardcode
+    amount = '0',
+    gasLimit = 3000000,
     gasPrice = 1,
-  }: {
-    abi: any;
-    smcAddr: string;
-    methodName: string;
-    params: any[];
-    amount?: number | string;
-    gasLimit?: number;
-    gasPrice?: number;
-  }): Promise<any> {
+  }: SMCParams.InvokeParams): Promise<any> => {
     const abiJson =
       typeof abi === 'string'
         ? JSON.parse(abi)
@@ -82,10 +76,35 @@ export abstract class AbstractSmcService {
         gas: gasLimit,
         gasPrice: gasPrice,
         value: amount,
-        to: smcAddr,
+        to: contractAddr,
         data: data,
       },
       true
     );
-  }
+  };
+
+  smcSendAction = async ({
+    abi,
+    contractAddr,
+    methodName,
+    params,
+    account,
+    amount = '0',
+    gasLimit = DEFAULT_GAS_LIMIT,
+    gasPrice = DEFAULT_GAS_PRICE,
+  }: SMCParams.SendActionParams) => {
+    if (!account.publicKey || !account.privateKey) {
+      return;
+    }
+
+    this.kardiaContract.updateAbi(abi);
+    const invoke = await this.kardiaContract.invokeContract(methodName, params);
+
+    return invoke.send(account.privateKey, contractAddr, {
+      from: account.publicKey,
+      amount: amount,
+      gas: gasLimit,
+      gasPrice: gasPrice,
+    });
+  };
 }

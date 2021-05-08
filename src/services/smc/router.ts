@@ -31,7 +31,7 @@ export class RouterService extends AbstractSmcService {
   }: SMCParams.AddLiquidity) => {
     return this.invokeSMC({
       abi: this.abi,
-      smcAddr: this.smcAddress,
+      contractAddr: this.smcAddress,
       methodName: methodNames.ADD_LIQUIDITY,
       params: [
         tokenA,
@@ -58,7 +58,7 @@ export class RouterService extends AbstractSmcService {
     return this.invokeSMC({
       abi: this.abi,
       amount: amountKAI,
-      smcAddr: this.smcAddress,
+      contractAddr: this.smcAddress,
       methodName: methodNames.ADD_LIQUIDITY_KAI,
       params: [
         tokenAddress,
@@ -82,7 +82,7 @@ export class RouterService extends AbstractSmcService {
   }: SMCParams.RemoveLiquidity) => {
     return this.invokeSMC({
       abi: this.abi,
-      smcAddr: this.smcAddress,
+      contractAddr: this.smcAddress,
       methodName: methodNames.REMOVE_LIQUIDITY,
       params: [
         tokenAddressA,
@@ -106,7 +106,7 @@ export class RouterService extends AbstractSmcService {
   }: SMCParams.RemoveLiquidityKAI) => {
     return this.invokeSMC({
       abi: this.abi,
-      smcAddr: this.smcAddress,
+      contractAddr: this.smcAddress,
       methodName: methodNames.REMOVE_LIQUIDITY_KAI,
       params: [
         tokenAddress,
@@ -119,13 +119,13 @@ export class RouterService extends AbstractSmcService {
     });
   };
 
-  swapTokens = ({ methodName, args, amount }: SMCParams.CallParams) => {
+  swapTokens = ({ methodName, args, amount = '0' }: SMCParams.CallParams) => {
     return this.invokeSMC({
       abi: this.abi,
-      smcAddr: this.smcAddress,
+      contractAddr: this.smcAddress,
       methodName: methodName,
       params: args,
-      amount: amount ? amount : 0,
+      amount: amount,
     });
   };
 

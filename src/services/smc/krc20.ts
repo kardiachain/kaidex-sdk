@@ -24,7 +24,7 @@ export class KRC20Service extends AbstractSmcService {
   ): Promise<any> => {
     return this.invokeSMC({
       abi: this.abi,
-      smcAddr: tokenAddr,
+      contractAddr: tokenAddr,
       methodName: methodNames.APPROVE,
       params: [spenderAddr, DEFAULT_APPROVE_AMOUNT],
     });

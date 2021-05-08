@@ -11,7 +11,7 @@ export class LimitOrderService extends AbstractSmcService {
   }: SMCParams.OrderInputKAI): Promise<any> => {
     return this.invokeSMC({
       abi: this.abi,
-      smcAddr: this.smcAddress,
+      contractAddr: this.smcAddress,
       methodName: methodNames.ORDER_INPUT_KAI,
       params: [outputTokenAddr, outputAmount, orderType, tradeType],
       amount: kaiAmountIn,
@@ -28,7 +28,7 @@ export class LimitOrderService extends AbstractSmcService {
   }: SMCParams.OrderInputTokens): Promise<any> => {
     return this.invokeSMC({
       abi: this.abi,
-      smcAddr: this.smcAddress,
+      contractAddr: this.smcAddress,
       methodName: methodNames.ORDER_INPUT_TOKENS,
       params: [
         inputTokenAddr,
@@ -47,7 +47,7 @@ export class LimitOrderService extends AbstractSmcService {
   }: SMCParams.CancelOrder): Promise<any> => {
     return this.invokeSMC({
       abi: this.abi,
-      smcAddr: this.smcAddress,
+      contractAddr: this.smcAddress,
       methodName: methodNames.CANCEL_ORDER,
       params: [pairAddr, orderID],
     });

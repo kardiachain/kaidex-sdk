@@ -1,8 +1,30 @@
 declare namespace SMCParams {
   interface CallParams {
+    abi: any;
     methodName: string;
-    args: (string | string[])[];
-    amount: number | string;
+    args: (number | string | string[])[];
+    amount?: string;
+  }
+
+  interface InvokeParams {
+    amount?: string;
+    gasLimit?: number;
+    gasPrice?: number;
+    abi: any;
+    contractAddr: string;
+    methodName: string;
+    params: (number | string | string[])[];
+  }
+
+  interface SendActionParams {
+    abi: any;
+    contractAddr: string;
+    methodName: string;
+    params: any;
+    account: Account;
+    amount: string;
+    gasLimit?: number;
+    gasPrice?: number;
   }
 
   interface AddLiquidity {

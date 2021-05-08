@@ -5,7 +5,9 @@ import PAIR from './abi/pair.json';
 import LIMIT_ORDER from './abi/limit-order.json';
 // import WKAI from './abi/wkai.json';
 
-export const DEADLINE_DEFAULT = 5; // 5 mins
+export const DEFAULT_DEADLINE = 5; // 5 mins
+export const DEFAULT_GAS_LIMIT = 3000000;
+export const DEFAULT_GAS_PRICE = 2000000000;
 
 export const abiJson = {
   ROUTER,
