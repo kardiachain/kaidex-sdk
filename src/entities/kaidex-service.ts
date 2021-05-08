@@ -79,4 +79,7 @@ export abstract class KaidexService {
 
   getPair = (tokenA: string, tokenB: string) =>
     this.factory.getPair(tokenA, tokenB);
+
+  getReserves = (tokenA: string, tokenB: string) =>
+    this.router.getReserves(tokenA, tokenB);
 }

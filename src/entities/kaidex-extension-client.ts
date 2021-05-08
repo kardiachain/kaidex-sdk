@@ -25,4 +25,11 @@ export class KaidexExtensionClient extends KaidexService {
     this.router.swapTokensForExactKAI(args);
   swapKAIForExactTokens = (args: SMCParams.InputSwapParams) =>
     this.router.swapKAIForExactTokens(args);
+
+  orderInputKAI = (args: SMCParams.OrderInputKAI) =>
+    this.limitOrder.orderInputKAI(args);
+  orderInputTokens = (args: SMCParams.OrderInputTokens) =>
+    this.limitOrder.orderInputTokens(args);
+  cancelOrder = (args: SMCParams.CancelOrder) =>
+    this.limitOrder.cancelOrder(args);
 }
