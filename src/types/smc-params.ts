@@ -21,8 +21,8 @@ declare namespace SMCParams {
     contractAddr: string;
     methodName: string;
     params: any;
-    account: Account;
-    amount: string;
+    account: KAIAccount;
+    amount?: string;
     gasLimit?: number;
     gasPrice?: number;
   }
@@ -35,7 +35,7 @@ declare namespace SMCParams {
     tokenA: string;
     tokenB: string;
     address: string;
-    deadline: number;
+    deadlineInMilliseconds: number;
   }
 
   interface AddLiquidityKAI {
@@ -45,7 +45,7 @@ declare namespace SMCParams {
     amountKAI: string;
     amountKAIMin: string;
     address: string;
-    deadline: number;
+    deadlineInMilliseconds: number;
   }
 
   interface RemoveLiquidity {
@@ -55,7 +55,7 @@ declare namespace SMCParams {
     amountAMin: string;
     amountBMin: string;
     walletAddress: string;
-    deadline: number;
+    deadlineInMilliseconds: number;
   }
 
   interface RemoveLiquidityKAI {
@@ -64,7 +64,22 @@ declare namespace SMCParams {
     amountTokenMin: string;
     amountKAIMin: string;
     walletAddress: string;
-    deadline: number;
+    deadlineInMilliseconds: number;
+  }
+
+  interface SwapParams {
+    exactAmount: string;
+    path: string;
+    addressTo: string;
+    deadlineInMilliseconds: number;
+  }
+
+  interface OutputSwapParams extends SwapParams {
+    minimumOutputAmountInDecimal: string;
+  }
+
+  interface InputSwapParams extends SwapParams {
+    maximumInputAmountInDecimal: string;
   }
 
   interface OrderInputKAI {

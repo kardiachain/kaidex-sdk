@@ -5,13 +5,13 @@ import { KardiaAccount } from 'kardia-js-sdk';
 
 export class KRC20Service extends AbstractSmcService {
   getAllowance = async (
-    contractAddr: string,
+    tokenAddress: string,
     owner: string,
     spenderAddr: string
   ): Promise<JSBI> => {
     const amount = await this.smcCallData({
       abi: this.abi,
-      contractAddr: contractAddr,
+      contractAddr: tokenAddress,
       methodName: methodNames.ALLOWANCE,
       params: [owner, spenderAddr],
     });
@@ -20,14 +20,17 @@ export class KRC20Service extends AbstractSmcService {
 
   approveToken = async (
     tokenAddr: string,
-    spenderAddr: string
+    spenderAddr: string,
+    account?: KAIAccount
   ): Promise<any> => {
-    return this.invokeSMC({
+    const args = {
       abi: this.abi,
       contractAddr: tokenAddr,
       methodName: methodNames.APPROVE,
       params: [spenderAddr, DEFAULT_APPROVE_AMOUNT],
-    });
+    };
+
+    return this.processSmcParams(args, account);
   };
 
   getKrc20Token = async (

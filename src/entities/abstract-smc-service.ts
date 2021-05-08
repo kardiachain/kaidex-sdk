@@ -94,8 +94,14 @@ export abstract class AbstractSmcService {
     gasPrice = DEFAULT_GAS_PRICE,
   }: SMCParams.SendActionParams) => {
     if (!account.publicKey || !account.privateKey) {
-      return;
+      throw new Error('Invalid account');
     }
+
+    console.log('Transaction params:');
+    console.log('Contract address:', contractAddr);
+    console.log('Method name:', methodName);
+    console.log('Params:', params);
+    console.log('Amount:', amount);
 
     this.kardiaContract.updateAbi(abi);
     const invoke = await this.kardiaContract.invokeContract(methodName, params);
@@ -106,5 +112,10 @@ export abstract class AbstractSmcService {
       gas: gasLimit,
       gasPrice: gasPrice,
     });
+  };
+
+  processSmcParams = (args: any, account?: KAIAccount) => {
+    if (!account) return this.invokeSMC(args);
+    return this.smcSendAction({ ...args, account });
   };
 }

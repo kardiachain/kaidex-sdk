@@ -1,4 +1,4 @@
-interface Account {
+interface KAIAccount {
   publicKey: string;
   privateKey: string;
 }

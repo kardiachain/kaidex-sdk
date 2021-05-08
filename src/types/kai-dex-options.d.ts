@@ -1,7 +1,11 @@
-interface KaiDEXOptions {
+interface KaidexOptions {
   rpcEndpoint?: string;
   abis?: ABIS;
   smcAddresses?: SmcAddresses;
+}
+
+interface NonExtensionKaidexOptions extends KaidexOptions {
+  account: KAIAccount;
 }
 
 interface ABIS {
