@@ -101,3 +101,31 @@ For vanilla CSS, you can include it at the root directory and add it to the `fil
 ## Publishing to NPM
 
 We recommend using [np](https://github.com/sindresorhus/np).
+
+## Usage
+```js
+import { KaidexClient, KaidexExtensionClient } from 'kaidex-sdk'
+
+// For extension
+const client = new KaidexExtensionClient()
+
+// Non-extension
+const client = new KaidexClient({
+    account: { publicKey: '...', privateKey: '...' }
+})
+
+client.approveToken(tokenAddress, spenderAddress) 
+client.addLiquidity(args: SMCParams.AddLiquidity)
+client.removeLiquidity(args: SMCParams.RemoveLiquidity) 
+client.addLiquidityKAI(args: SMCParams.AddLiquidityKAI)
+client.removeLiquidityKAI(args: SMCParams.RemoveLiquidityKAI)
+client.swapExactTokensForTokens(args: SMCParams.OutputSwapParams)
+client.swapTokensForExactTokens(args: SMCParams.InputSwapParams)
+client.swapExactKAIForTokens(args: SMCParams.OutputSwapParams)
+client.swapExactTokensForKAI(args: SMCParams.OutputSwapParams)
+client.swapTokensForExactKAI(args: SMCParams.InputSwapParams)
+client.swapKAIForExactTokens(args: SMCParams.InputSwapParams)
+client.orderInputKAI(args: SMCParams.OrderInputKAI)
+client.orderInputTokens(args: SMCParams.OrderInputTokens)
+client.cancelOrder(args: SMCParams.CancelOrder)
+```
