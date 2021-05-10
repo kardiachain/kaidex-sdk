@@ -1,3 +1,18 @@
+import JSBI from 'jsbi';
+import { Fraction } from '../entities';
+
+// const ZERO = JSBI.BigInt(0)
+export const ONE = JSBI.BigInt(1);
+// const THREE = JSBI.BigInt(3)
+export const TEN = JSBI.BigInt(10);
+// const TWENTY_FIVE = JSBI.BigInt(25)
+// const FIFTY = JSBI.BigInt(50)
+// const SEVENTY_FIVE = JSBI.BigInt(75)
+// const ONE_HUNDRED = JSBI.BigInt(100)
+// const ONE_THOUSAND = JSBI.BigInt(1000)
+// const ONE_MILLION = JSBI.BigInt(1000000)
+// const ONE_BILLION = JSBI.BigInt(1000000000)
+
 const cellValue = (kaiValue: any, decimals: number = 18): string => {
   let cellString = removeTrailingZeros(kaiValue);
   let decimalStr = cellString.split('.')[1];
@@ -9,6 +24,29 @@ const cellValue = (kaiValue: any, decimals: number = 18): string => {
   }
   cellString = `${numberStr}${decimalStr || ''}`;
   return cellString;
+};
+
+const convertValueFollowDecimal = (
+  value: Fraction | string,
+  decimals: number
+): string => {
+  try {
+    const valueFrac = typeof value === 'string' ? value.toFraction() : value;
+    if (valueFrac.equalTo(0)) {
+      return '0';
+    }
+
+    if (!decimals) {
+      return valueFrac.toFixed();
+    }
+
+    const DecimalsbigNum = JSBI.BigInt(decimals);
+    const parseB = JSBI.exponentiate(TEN, DecimalsbigNum).toString();
+    return removeTrailingZeros(valueFrac.divide(parseB).toFixed(decimals));
+  } catch (error) {
+    console.error('Error converting value from decimal:', error);
+    return '0';
+  }
 };
 
 const removeTrailingZeros = (value: any) => {
@@ -32,4 +70,8 @@ const removeTrailingZeros = (value: any) => {
 };
 
 // export { cellValue };
-export const Utils = { cellValue };
+export const Utils = {
+  cellValue,
+  convertValueFollowDecimal,
+  removeTrailingZeros,
+};

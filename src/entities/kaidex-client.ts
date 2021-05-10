@@ -1,5 +1,6 @@
 import { KaidexService } from './kaidex-service';
 import { KardiaAccount } from 'kardia-js-sdk';
+import JSBI from 'jsbi';
 
 export class KaidexClient extends KaidexService {
   private account: KAIAccount;
@@ -16,8 +17,20 @@ export class KaidexClient extends KaidexService {
 
   updateAccount = (account: KAIAccount) => (this.account = account);
 
-  approveToken = (tokenAddress: string, spenderAddress: string) =>
-    this.krc20.approveToken(tokenAddress, spenderAddress, this.account);
+  approveToken = (tokenAddress: string) =>
+    this.krc20.approveToken(
+      tokenAddress,
+      this.smcAddresses.router,
+      this.account
+    );
+  getApproveState = async (tokenAddr: string): Promise<any> => {
+    const res = await this.krc20.getAllowance(
+      tokenAddr,
+      this.account.publicKey,
+      this.smcAddresses.router
+    );
+    return JSBI.BigInt(res).toString();
+  };
 
   addLiquidity = (args: SMCParams.AddLiquidity) =>
     this.router.addLiquidity(args, this.account);

@@ -1,8 +1,20 @@
 import { KaidexService } from './kaidex-service';
+import JSBI from 'jsbi';
 
 export class KaidexExtensionClient extends KaidexService {
-  approveToken = (tokenAddress: string, spenderAddress: string) =>
-    this.krc20.approveToken(tokenAddress, spenderAddress);
+  approveToken = (tokenAddress: string) =>
+    this.krc20.approveToken(tokenAddress, this.smcAddresses.router);
+  getApproveState = async (
+    tokenAddr: string,
+    walletAddress: string
+  ): Promise<any> => {
+    const res = await this.krc20.getAllowance(
+      tokenAddr,
+      walletAddress,
+      this.smcAddresses.router
+    );
+    return JSBI.BigInt(res).toString();
+  };
 
   addLiquidity = (args: SMCParams.AddLiquidity) =>
     this.router.addLiquidity(args);
