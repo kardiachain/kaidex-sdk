@@ -104,10 +104,10 @@ We recommend using [np](https://github.com/sindresorhus/np).
 
 ## Usage
 ```js
-import { KaidexClient, KaidexExtensionClient } from 'kaidex-sdk'
+import KaidexClient from 'kaidex-sdk'
 
 // For extension
-const client = new KaidexExtensionClient()
+const client = new KaidexClient()
 
 // Non-extension
 const client = new KaidexClient({

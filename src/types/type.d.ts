@@ -18,6 +18,17 @@ interface Pair {
   liquidity?: string;
 }
 
+interface MyLiquidityPair {
+  balance: string;
+  name: string;
+  pairAddress: string;
+  tokenA: Token;
+  tokenB: Token;
+  provider: string;
+  amountA: string;
+  amountB: string;
+}
+
 interface Token {
   tokenAddress: string;
   logo?: string;

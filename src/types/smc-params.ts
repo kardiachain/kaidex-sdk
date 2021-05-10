@@ -34,7 +34,7 @@ declare namespace SMCParams {
     amountBMin: string;
     tokenA: string;
     tokenB: string;
-    address: string;
+    walletAddress: string;
     deadlineInMilliseconds: number;
   }
 
@@ -44,13 +44,13 @@ declare namespace SMCParams {
     amountTokenDesired: string;
     amountKAI: string;
     amountKAIMin: string;
-    address: string;
+    walletAddress: string;
     deadlineInMilliseconds: number;
   }
 
   interface RemoveLiquidity {
-    tokenAddressA: string;
-    tokenAddressB: string;
+    tokenA: string;
+    tokenB: string;
     liquidity: string;
     amountAMin: string;
     amountBMin: string;

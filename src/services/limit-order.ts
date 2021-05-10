@@ -1,5 +1,5 @@
-import { methodNames } from '../../constants';
-import { AbstractSmcService } from '../../entities';
+import { methodNames } from '../constants';
+import { AbstractSmcService } from '../entities';
 
 export class LimitOrderService extends AbstractSmcService {
   orderInputKAI = async (

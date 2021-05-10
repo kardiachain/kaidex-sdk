@@ -1,45 +1,89 @@
 import { KaidexService } from './kaidex-service';
 import { KardiaAccount } from 'kardia-js-sdk';
 import JSBI from 'jsbi';
+import { MINIMUM_TOKEN_AMOUNT } from '../constants';
+import { Utils } from '../utils';
 
 export class KaidexClient extends KaidexService {
   private account: KAIAccount;
 
-  constructor(props: NonExtensionKaidexOptions) {
+  constructor(props: KaidexOptions) {
     super(props);
-    const { account } = props;
 
+    const account = props.account
+      ? props.account
+      : { privateKey: '', publicKey: '' };
     this.account = account;
     const { privateKey, publicKey } = account;
+
     if (!KardiaAccount.isAddress(publicKey) || !privateKey.trim())
       throw new Error('Invalid Account!');
   }
 
   updateAccount = (account: KAIAccount) => (this.account = account);
 
-  approveToken = (tokenAddress: string) =>
-    this.krc20.approveToken(
-      tokenAddress,
-      this.smcAddresses.router,
-      this.account
-    );
-  getApproveState = async (tokenAddr: string): Promise<any> => {
-    const res = await this.krc20.getAllowance(
+  public getPair = (tokenA: string, tokenB: string) =>
+    this.factory.getPair(tokenA, tokenB);
+
+  approveToken = (tokenAddress: string): Promise<any> =>
+    this.krc20.approveToken(tokenAddress, this.account);
+
+  getApproveState = async (
+    tokenAddr: string,
+    amountToCheck: string | number
+  ): Promise<any> => {
+    const amount = Number(amountToCheck) || MINIMUM_TOKEN_AMOUNT;
+    const currentAllowance = await this.krc20.getAllowance(
       tokenAddr,
-      this.account.publicKey,
-      this.smcAddresses.router
+      this.account.publicKey
     );
-    return JSBI.BigInt(res).toString();
+
+    return JSBI.lessThan(
+      currentAllowance,
+      JSBI.BigInt(Utils.cellValue(amount))
+    );
   };
 
-  addLiquidity = (args: SMCParams.AddLiquidity) =>
-    this.router.addLiquidity(args, this.account);
-  removeLiquidity = (args: SMCParams.RemoveLiquidity) =>
-    this.router.removeLiquidity(args, this.account);
-  addLiquidityKAI = (args: SMCParams.AddLiquidityKAI) =>
-    this.router.addLiquidityKAI(args, this.account);
-  removeLiquidityKAI = (args: SMCParams.RemoveLiquidityKAI) =>
-    this.router.removeLiquidityKAI(args, this.account);
+  getTokenBalance = (tokenAddress: string, walletAddress: string) => {
+    const _walletAddress = walletAddress
+      ? walletAddress
+      : this.account.publicKey;
+    return this.krc20.balanceOf(tokenAddress, _walletAddress);
+  };
+
+  addLiquidity = async (params: InputParams.addLiquidity) => {
+    const { tokenA, tokenB } = params;
+
+    if (this.isKAI(tokenA.tokenAddress) || this.isKAI(tokenB.tokenAddress)) {
+      const addLiquidityParams = await this.transformAddLiquidityKAIParams(
+        params
+      );
+      return this.router.addLiquidityKAI(addLiquidityParams);
+    }
+
+    const addLiquidityKAIParams = await this.transformAddLiquidityParams(
+      params
+    );
+    return this.router.addLiquidity(addLiquidityKAIParams);
+  };
+
+  removeLiquidity = async (params: InputParams.removeLiquidity) => {
+    const { tokenA, tokenB } = params.pair;
+    // For KAI Pairs
+    if (this.isKAI(tokenA.tokenAddress) || this.isKAI(tokenB.tokenAddress)) {
+      const removeLiquidityKAIParams = await this.transformRemoveLiquidityKAIParams(
+        params
+      );
+      return this.router.removeLiquidityKAI(
+        removeLiquidityKAIParams,
+        this.account
+      );
+    }
+    const removeLiquidityParams = await this.transformRemoveLiquidityParams(
+      params
+    );
+    return this.router.removeLiquidity(removeLiquidityParams, this.account);
+  };
 
   swapExactTokensForTokens = (args: SMCParams.OutputSwapParams) =>
     this.router.swapExactTokensForTokens(args, this.account);
