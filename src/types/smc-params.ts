@@ -69,7 +69,7 @@ declare namespace SMCParams {
 
   interface SwapParams {
     exactAmount: string;
-    path: string;
+    path: string[];
     addressTo: string;
     deadlineInMilliseconds: number;
   }

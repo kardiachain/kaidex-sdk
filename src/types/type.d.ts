@@ -44,14 +44,6 @@ interface Token {
   disabled?: boolean;
 }
 
-interface KRC20Token {
-  address: string;
-  name: string;
-  symbol: string;
-  decimals: number;
-  balance: string;
-}
-
 interface PooledTokens {
   tokenA: string;
   tokenB: string;

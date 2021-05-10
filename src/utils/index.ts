@@ -73,7 +73,7 @@ const removeTrailingZeros = (value: any) => {
 };
 
 const calculateSlippageValue = async (
-  value: Fraction | string,
+  value: Fraction | string | number,
   slippageTolerance: string | number,
   type: 'add' | 'sub'
 ): Promise<string> => {
@@ -98,8 +98,16 @@ const calculateSlippageValue = async (
   }
 };
 
+const calculateLiquidityProvidersFee = (amountIn: string | number): string => {
+  return amountIn
+    .multiply(3)
+    .divide(1000)
+    .toFixed();
+};
+
 export const Utils = {
   cellValue,
   convertValueFollowDecimal,
   calculateSlippageValue,
+  calculateLiquidityProvidersFee,
 };

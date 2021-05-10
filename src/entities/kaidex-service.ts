@@ -95,15 +95,6 @@ export abstract class KaidexService {
     return new Date(latestBlock.time).getTime() + Number(txDeadline) * 60;
   };
 
-  public calculateLiquidityProvidersFee = (
-    amountIn: string | number
-  ): string => {
-    return amountIn
-      .multiply(3)
-      .divide(1000)
-      .toFixed();
-  };
-
   public calculateExchangeRate = async (
     tokenA: Token,
     tokenB: Token
@@ -131,7 +122,7 @@ export abstract class KaidexService {
   };
 
   protected transformAddLiquidityParams = async (
-    params: InputParams.addLiquidity
+    params: InputParams.AddLiquidity
   ) => {
     const {
       slippageTolerance,
@@ -178,7 +169,7 @@ export abstract class KaidexService {
   };
 
   protected transformAddLiquidityKAIParams = async (
-    params: InputParams.addLiquidity
+    params: InputParams.AddLiquidity
   ) => {
     const {
       amountADesired,
@@ -211,7 +202,7 @@ export abstract class KaidexService {
   };
 
   protected transformRemoveLiquidityParams = async (
-    params: InputParams.removeLiquidity
+    params: InputParams.RemoveLiquidity
   ) => {
     const {
       pair,
@@ -281,7 +272,7 @@ export abstract class KaidexService {
   };
 
   protected transformRemoveLiquidityKAIParams = async (
-    params: InputParams.removeLiquidity
+    params: InputParams.RemoveLiquidity
   ) => {
     const {
       tokenA,
@@ -305,5 +296,40 @@ export abstract class KaidexService {
       walletAddress,
       deadlineInMilliseconds,
     };
+  };
+
+  protected findSwapType = (
+    tokenA: string,
+    tokenB: string,
+    tradeType: TradeType,
+    tradeInputType: TradeInputType
+  ) => {
+    const swap = 'swap';
+    const kai = 'KAI';
+    const _for = 'For';
+    const tokens = 'Tokens';
+    const exact = 'Exact';
+
+    let tokenNameA: string;
+    let tokenNameB: string;
+
+    const isKAIPair = this.isKAI(tokenA) || this.isKAI(tokenB);
+    const exactFirst =
+      (tradeType === TradeType.SELL &&
+        tradeInputType === TradeInputType.AMOUNT) ||
+      (tradeType === TradeType.BUY && tradeInputType === TradeInputType.TOTAL);
+
+    if (isKAIPair) {
+      const kaiFirst =
+        (tradeType === TradeType.BUY && this.isKAI(tokenB)) ||
+        (tradeType === TradeType.SELL && this.isKAI(tokenA));
+      tokenNameA = `${exactFirst ? exact : ''}${kaiFirst ? kai : tokens}`;
+      tokenNameB = `${exactFirst ? '' : exact}${kaiFirst ? tokens : kai}`;
+    } else {
+      tokenNameA = `${exactFirst ? exact : ''}${tokens}`;
+      tokenNameB = `${exactFirst ? '' : exact}${tokens}`;
+    }
+
+    return swap + tokenNameA + _for + tokenNameB;
   };
 }
