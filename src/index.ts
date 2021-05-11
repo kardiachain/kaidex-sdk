@@ -1,4 +1,3 @@
-import './extensions/fraction';
 import { KaidexClient } from './entities/kaidex-client';
 
 export { Fraction } from './entities/fraction';

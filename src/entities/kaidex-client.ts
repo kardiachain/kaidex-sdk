@@ -3,8 +3,8 @@ import { KardiaAccount } from 'kardia-js-sdk';
 import JSBI from 'jsbi';
 import { methodNames, MINIMUM_TOKEN_AMOUNT } from '../constants';
 import { Utils } from '../utils';
-import { InputParams } from "../types/input-params";
-import { TradeType } from "../types/input-params";
+import { InputParams } from '../types/input-params';
+import { TradeType } from '../types/input-params';
 
 export class KaidexClient extends KaidexService {
   private account: KAIAccount;

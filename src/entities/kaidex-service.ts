@@ -10,8 +10,8 @@ import {
   KRC20Service,
   LimitOrderService,
 } from '../services';
-import { TradeType, TradeInputType } from "../types/input-params";
-import { InputParams } from "../types/input-params";
+import { TradeType, TradeInputType } from '../types/input-params';
+import { InputParams } from '../types/input-params';
 import { Utils } from '../utils';
 import JSBI from 'jsbi';
 

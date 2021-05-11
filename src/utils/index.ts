@@ -99,7 +99,9 @@ const calculateSlippageValue = async (
 };
 
 const calculateLiquidityProvidersFee = (amountIn: string | number): string => {
-  return amountIn
+  const amountFrac = new Fraction(amountIn);
+
+  return amountFrac
     .multiply(3)
     .divide(1000)
     .toFixed();
