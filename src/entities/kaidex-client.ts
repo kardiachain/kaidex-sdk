@@ -157,6 +157,32 @@ export class KaidexClient extends KaidexService {
     return slippage.multiply(100).toFixed(5);
   };
 
+  public calculateExchangeRate = async (
+    tokenA: Token,
+    tokenB: Token
+  ): Promise<{ rateAB: number; rateBA: number }> => {
+    const { reserveA, reserveB } = await this.router.getReserves(
+      tokenA.tokenAddress,
+      tokenB.tokenAddress
+    );
+
+    const tokenAValue = Utils.convertValueFollowDecimal(
+      JSBI.BigInt(reserveA).toString(),
+      tokenA.decimals
+    );
+    const tokenBValue = Utils.convertValueFollowDecimal(
+      JSBI.BigInt(reserveB).toString(),
+      tokenB.decimals
+    );
+
+    const _tokenAValue = Number(tokenAValue);
+    const _tokenBValue = Number(tokenBValue);
+    const rateAB = _tokenAValue ? _tokenBValue / _tokenAValue : 0;
+    const rateBA = _tokenBValue ? _tokenAValue / _tokenBValue : 0;
+
+    return { rateAB, rateBA };
+  };
+
   marketSwap = async ({
     txDeadline,
     slippageTolerance,
