@@ -4,7 +4,8 @@ import _Big from 'big.js';
 import toFormat from 'toformat';
 import { Rounding } from '../types/enums';
 import { BigintIsh } from '../types/bigint';
-import { ONE } from '../utils';
+
+const ONE = JSBI.BigInt(1);
 
 const Decimal = toFormat(_Decimal);
 const Big = toFormat(_Big);

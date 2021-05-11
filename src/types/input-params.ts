@@ -1,14 +1,14 @@
-enum TradeType {
+export enum TradeType {
   BUY = 'BUY',
   SELL = 'SELL',
 }
 
-enum TradeInputType {
+export enum TradeInputType {
   AMOUNT = 'AMOUNT',
   TOTAL = 'TOTAL',
 }
 
-declare namespace InputParams {
+export declare namespace InputParams {
   interface AddLiquidity {
     inputAmount: string | number;
     outputAmount: string | number;

@@ -1,4 +1,4 @@
-import { Fraction } from '../../entities';
+import { Fraction } from '../../entities/fraction';
 
 declare global {
   interface FractionPrototypes {
