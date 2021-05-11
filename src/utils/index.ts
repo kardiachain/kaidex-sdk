@@ -39,7 +39,7 @@ const convertValueFollowDecimal = (
       return '0';
     }
 
-    if (!decimals) {
+    if (decimals === undefined || decimals === null) {
       return valueFrac.toFixed();
     }
 

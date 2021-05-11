@@ -45,6 +45,6 @@ interface Token {
 }
 
 interface PooledTokens {
-  tokenA: string;
-  tokenB: string;
+  reserveA: string;
+  reserveB: string;
 }

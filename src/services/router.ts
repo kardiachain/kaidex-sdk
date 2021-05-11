@@ -16,7 +16,7 @@ export class RouterService extends AbstractSmcService {
       params: [tokenA, tokenB],
     });
 
-    return { tokenA: result['reserveA'], tokenB: result['reserveB'] };
+    return { reserveA: result['reserveA'], reserveB: result['reserveB'] };
   };
 
   addLiquidity = (

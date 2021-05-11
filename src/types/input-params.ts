@@ -37,4 +37,19 @@ export declare namespace InputParams {
     slippageTolerance: string | number;
     txDeadline: string | number;
   }
+
+  interface CalculateOutputAmount {
+    amountIn: number | string;
+    tradeInputType: TradeInputType;
+    tokenA: Token;
+    tokenB: Token;
+  }
+
+  interface CalculatePriceImpact {
+    tokenA: Token;
+    tokenB: Token;
+    inputAmount: string;
+    estimateOutput: string;
+    tradeInputType: TradeInputType;
+  }
 }

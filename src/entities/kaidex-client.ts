@@ -4,7 +4,8 @@ import JSBI from 'jsbi';
 import { methodNames, MINIMUM_TOKEN_AMOUNT } from '../constants';
 import { Utils } from '../utils';
 import { InputParams } from '../types/input-params';
-import { TradeType } from '../types/input-params';
+import { TradeType, TradeInputType } from '../types/input-params';
+import { Fraction } from './fraction';
 
 export class KaidexClient extends KaidexService {
   private account: KAIAccount;
@@ -30,14 +31,15 @@ export class KaidexClient extends KaidexService {
   approveToken = (tokenAddress: string): Promise<any> =>
     this.krc20.approveToken(tokenAddress, this.account);
 
-  getApproveState = async (
+  getApprovalState = async (
     tokenAddr: string,
+    walletAddress: string,
     amountToCheck: string | number
   ): Promise<any> => {
     const amount = Number(amountToCheck) || MINIMUM_TOKEN_AMOUNT;
     const currentAllowance = await this.krc20.getAllowance(
       tokenAddr,
-      this.account.publicKey
+      walletAddress
     );
 
     return JSBI.lessThan(
@@ -85,6 +87,74 @@ export class KaidexClient extends KaidexService {
       params
     );
     return this.router.removeLiquidity(removeLiquidityParams, this.account);
+  };
+
+  calculateOutputAmount = async ({
+    amountIn,
+    tradeInputType,
+    tokenA,
+    tokenB,
+  }: InputParams.CalculateOutputAmount): Promise<string> => {
+    if (
+      !amountIn ||
+      !tokenA.tokenAddress ||
+      !tokenB.tokenAddress ||
+      tokenA.decimals === undefined ||
+      tokenB.decimals === undefined
+    )
+      throw new Error('Params input error.');
+
+    const amountInDec =
+      tradeInputType === TradeInputType.AMOUNT
+        ? Utils.cellValue(amountIn, tokenA.decimals)
+        : Utils.cellValue(amountIn, tokenB.decimals);
+    const path =
+      tradeInputType === TradeInputType.AMOUNT
+        ? [tokenA.tokenAddress, tokenB.tokenAddress]
+        : [tokenB.tokenAddress, tokenA.tokenAddress];
+
+    return this.router.getAmountsOut(amountInDec, path);
+  };
+
+  calculatePriceImpact = async ({
+    tokenA,
+    tokenB,
+    inputAmount,
+    estimateOutput,
+    tradeInputType,
+  }: InputParams.CalculatePriceImpact) => {
+    const inputToken =
+      tradeInputType === TradeInputType.AMOUNT ? tokenA : tokenB;
+    const outputToken =
+      tradeInputType === TradeInputType.AMOUNT ? tokenB : tokenA;
+
+    const { reserveA, reserveB } = await this.router.getReserves(
+      inputToken.tokenAddress,
+      outputToken.tokenAddress
+    );
+
+    if (!reserveA || reserveA === '0' || !reserveB || reserveB === '0')
+      return '0';
+
+    const inputAmountInDecimal = Utils.cellValue(
+      inputAmount,
+      inputToken.decimals
+    );
+    const midPrice = tokenA
+      ? new Fraction(reserveB).divide(reserveA)
+      : new Fraction(0);
+    const inputAmountFrac = new Fraction(
+      inputAmountInDecimal,
+      JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(inputToken.decimals))
+    );
+    const estimateOutputFrac = new Fraction(
+      estimateOutput,
+      JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(outputToken.decimals))
+    );
+    const exactQuote = midPrice.multiply(inputAmountFrac);
+    const slippage = exactQuote.subtract(estimateOutputFrac).divide(exactQuote);
+
+    return slippage.multiply(100).toFixed(5);
   };
 
   marketSwap = async ({
