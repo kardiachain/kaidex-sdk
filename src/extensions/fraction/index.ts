@@ -1,4 +1,4 @@
-import { Fraction } from '../../entities/fraction';
+import { Fraction } from '../../entities';
 
 declare global {
   interface FractionPrototypes {
@@ -78,7 +78,7 @@ const fractionPrototypes: FractionPrototypes = {
   },
 };
 
-/*eslint no-extend-native: */
+
 String.prototype.add = fractionPrototypes.add;
 String.prototype.subtract = fractionPrototypes.subtract;
 String.prototype.multiply = fractionPrototypes.multiply;

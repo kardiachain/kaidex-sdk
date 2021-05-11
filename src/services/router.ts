@@ -1,6 +1,6 @@
-import { methodNames } from '../../constants';
+import { methodNames } from '../constants';
 import JSBI from 'jsbi';
-import { AbstractSmcService } from '../../entities';
+import { AbstractSmcService } from '../entities';
 
 export class RouterService extends AbstractSmcService {
   getReserves = async (
@@ -27,7 +27,7 @@ export class RouterService extends AbstractSmcService {
       amountBMin,
       tokenA,
       tokenB,
-      address,
+      walletAddress,
       deadlineInMilliseconds,
     }: SMCParams.AddLiquidity,
     account?: KAIAccount
@@ -43,7 +43,7 @@ export class RouterService extends AbstractSmcService {
         amountBDesired,
         amountAMin,
         amountBMin,
-        address,
+        walletAddress,
         deadlineInMilliseconds,
       ],
     };
@@ -58,7 +58,7 @@ export class RouterService extends AbstractSmcService {
       amountTokenDesired,
       amountKAI,
       amountKAIMin,
-      address,
+      walletAddress,
       deadlineInMilliseconds,
     }: SMCParams.AddLiquidityKAI,
     account?: KAIAccount
@@ -73,7 +73,7 @@ export class RouterService extends AbstractSmcService {
         amountTokenDesired,
         amountTokenMin,
         amountKAIMin,
-        address,
+        walletAddress,
         deadlineInMilliseconds,
       ],
     };
@@ -83,8 +83,8 @@ export class RouterService extends AbstractSmcService {
 
   removeLiquidity = (
     {
-      tokenAddressA,
-      tokenAddressB,
+      tokenA,
+      tokenB,
       liquidity,
       amountAMin,
       amountBMin,
@@ -98,8 +98,8 @@ export class RouterService extends AbstractSmcService {
       contractAddr: this.smcAddress,
       methodName: methodNames.REMOVE_LIQUIDITY,
       params: [
-        tokenAddressA,
-        tokenAddressB,
+        tokenA,
+        tokenB,
         liquidity,
         amountAMin,
         amountBMin,

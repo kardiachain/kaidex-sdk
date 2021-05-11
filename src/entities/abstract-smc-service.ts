@@ -115,7 +115,8 @@ export abstract class AbstractSmcService {
   };
 
   processSmcParams = (args: any, account?: KAIAccount) => {
-    if (!account) return this.invokeSMC(args);
+    if (!account || !account.publicKey || !account.privateKey)
+      return this.invokeSMC(args);
     return this.smcSendAction({ ...args, account });
   };
 }

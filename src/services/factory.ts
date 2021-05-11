@@ -1,5 +1,5 @@
-import { methodNames } from '../../constants';
-import { AbstractSmcService } from '../../entities';
+import { methodNames } from '../constants';
+import { AbstractSmcService } from '../entities';
 
 export class FactoryService extends AbstractSmcService {
   getPair = (tokenA: string, tokenB: string) => {

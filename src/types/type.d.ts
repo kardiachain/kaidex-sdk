@@ -18,6 +18,17 @@ interface Pair {
   liquidity?: string;
 }
 
+interface MyLiquidityPair {
+  balance: string;
+  name: string;
+  pairAddress: string;
+  tokenA: Token;
+  tokenB: Token;
+  provider: string;
+  amountA: string;
+  amountB: string;
+}
+
 interface Token {
   tokenAddress: string;
   logo?: string;
@@ -31,14 +42,6 @@ interface Token {
   yourBalance: string;
   wKAI?: boolean;
   disabled?: boolean;
-}
-
-interface KRC20Token {
-  address: string;
-  name: string;
-  symbol: string;
-  decimals: number;
-  balance: string;
 }
 
 interface PooledTokens {

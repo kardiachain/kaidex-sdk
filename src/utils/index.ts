@@ -13,6 +13,9 @@ export const TEN = JSBI.BigInt(10);
 // const ONE_MILLION = JSBI.BigInt(1000000)
 // const ONE_BILLION = JSBI.BigInt(1000000000)
 
+// const ZERO_FRACTION = new Fraction(0)
+const ONE_FRACTION = new Fraction(1);
+
 const cellValue = (kaiValue: any, decimals: number = 18): string => {
   let cellString = removeTrailingZeros(kaiValue);
   let decimalStr = cellString.split('.')[1];
@@ -69,9 +72,42 @@ const removeTrailingZeros = (value: any) => {
   return after ? after : '0';
 };
 
-// export { cellValue };
+const calculateSlippageValue = async (
+  value: Fraction | string | number,
+  slippageTolerance: string | number,
+  type: 'add' | 'sub'
+): Promise<string> => {
+  try {
+    const slippageFrac = new Fraction(
+      cellValue(slippageTolerance),
+      cellValue(100)
+    );
+    let slippagePercent: Fraction;
+    if (type === 'sub') {
+      if (Number(slippageTolerance) > 100) {
+        return '0';
+      }
+      slippagePercent = ONE_FRACTION.subtract(slippageFrac);
+    } else {
+      slippagePercent = ONE_FRACTION.add(slippageFrac);
+    }
+    return value.multiply(slippagePercent).toFixed();
+  } catch (error) {
+    console.error('Error calculating slippage value:', error);
+    return '';
+  }
+};
+
+const calculateLiquidityProvidersFee = (amountIn: string | number): string => {
+  return amountIn
+    .multiply(3)
+    .divide(1000)
+    .toFixed();
+};
+
 export const Utils = {
   cellValue,
   convertValueFollowDecimal,
-  removeTrailingZeros,
+  calculateSlippageValue,
+  calculateLiquidityProvidersFee,
 };
