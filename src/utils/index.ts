@@ -34,7 +34,7 @@ const convertValueFollowDecimal = (
   decimals: number
 ): string => {
   try {
-    const valueFrac = typeof value === 'string' ? value.toFraction() : value;
+    const valueFrac = typeof value === 'string' ? new Fraction(value) : value;
     if (valueFrac.equalTo(0)) {
       return '0';
     }
@@ -78,6 +78,7 @@ const calculateSlippageValue = async (
   type: 'add' | 'sub'
 ): Promise<string> => {
   try {
+    const _value = value instanceof Fraction ? value : new Fraction(value);
     const slippageFrac = new Fraction(
       cellValue(slippageTolerance),
       cellValue(100)
@@ -91,7 +92,7 @@ const calculateSlippageValue = async (
     } else {
       slippagePercent = ONE_FRACTION.add(slippageFrac);
     }
-    return value.multiply(slippagePercent).toFixed();
+    return _value.multiply(slippagePercent).toFixed();
   } catch (error) {
     console.error('Error calculating slippage value:', error);
     return '';

@@ -14,6 +14,7 @@ import { TradeType, TradeInputType } from '../types/input-params';
 import { InputParams } from '../types/input-params';
 import { Utils } from '../utils';
 import JSBI from 'jsbi';
+import { Fraction } from './fraction';
 
 export abstract class KaidexService {
   protected abiJSON: Required<ABIS>;
@@ -222,7 +223,7 @@ export abstract class KaidexService {
     const totalSupply = await this.krc20.getTotalSupply(pairAddress);
 
     //liquidity = balance * withdrawPercent / 100
-    const liquidity = balance
+    const liquidity = new Fraction(balance)
       .multiply(withdrawPercent)
       .divide(100)
       .toFixed();
@@ -232,7 +233,7 @@ export abstract class KaidexService {
     );
 
     //amountAMin = (balance / totalSupply) * tokenABalance * withdrawPercent / 100
-    const amountAMin = balance
+    const amountAMin = new Fraction(balance)
       .divide(totalSupply)
       .multiply(tokenABalance)
       .multiply(withdrawPercent)
@@ -249,7 +250,7 @@ export abstract class KaidexService {
     );
 
     //amountBMin = (balance / totalSupply) * tokenBBalance * withdrawPercent / 100
-    const amountBMin = balance
+    const amountBMin = new Fraction(balance)
       .divide(totalSupply)
       .multiply(tokenBBalance)
       .multiply(withdrawPercent)
