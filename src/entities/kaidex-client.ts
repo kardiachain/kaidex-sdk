@@ -271,23 +271,60 @@ export class KaidexClient extends KaidexService {
     }
   };
 
-  // swapExactTokensForTokens = (args: SMCParams.OutputSwapParams) =>
-  //   this.router.swapExactTokensForTokens(args, this.account);
-  // swapTokensForExactTokens = (args: SMCParams.InputSwapParams) =>
-  //   this.router.swapTokensForExactTokens(args, this.account);
-  // swapExactKAIForTokens = (args: SMCParams.OutputSwapParams) =>
-  //   this.router.swapExactKAIForTokens(args, this.account);
-  // swapExactTokensForKAI = (args: SMCParams.OutputSwapParams) =>
-  //   this.router.swapExactTokensForKAI(args, this.account);
-  // swapTokensForExactKAI = (args: SMCParams.InputSwapParams) =>
-  //   this.router.swapTokensForExactKAI(args, this.account);
-  // swapKAIForExactTokens = (args: SMCParams.InputSwapParams) =>
-  //   this.router.swapKAIForExactTokens(args, this.account);
+  placeLimitOrder = ({
+    amount,
+    total,
+    tokenA,
+    tokenB,
+    tradeType,
+  }: InputParams.LimitOrder) => {
+    const inputToken = tradeType === TradeType.BUY ? tokenB : tokenA;
+    const outputToken = tradeType === TradeType.BUY ? tokenA : tokenB;
+    const {
+      tokenAddress: inputTokenAddr,
+      decimals: inputTokenDecimals,
+    } = inputToken;
+    const {
+      tokenAddress: outputTokenAddr,
+      decimals: outputTokenDecimals,
+    } = outputToken;
+    const inputAmount =
+      tradeType === TradeType.BUY
+        ? Utils.cellValue(total, inputTokenDecimals)
+        : Utils.cellValue(amount, inputTokenDecimals);
+    const outputAmount =
+      tradeType === TradeType.BUY
+        ? Utils.cellValue(amount, outputTokenDecimals)
+        : Utils.cellValue(total, outputTokenDecimals);
 
-  orderInputKAI = (args: SMCParams.OrderInputKAI) =>
-    this.limitOrder.orderInputKAI(args, this.account);
-  orderInputTokens = (args: SMCParams.OrderInputTokens) =>
-    this.limitOrder.orderInputTokens(args, this.account);
-  cancelOrder = (args: SMCParams.CancelOrder) =>
-    this.limitOrder.cancelOrder(args, this.account);
+    if (inputTokenAddr === this.smcAddresses.wkai) {
+      const _orderInputKai: SMCParams.LimitOrderKAI = {
+        outputAmount: outputAmount,
+        outputTokenAddr: outputTokenAddr,
+        kaiAmountIn: inputAmount,
+        orderType: 0,
+        tradeType: 0,
+      };
+      return this.limitOrder.limitOrderKAI(_orderInputKai, this.account);
+    } else {
+      const _orderInputToken: SMCParams.LimitOrder = {
+        inputTokenAddr: inputTokenAddr,
+        outputTokenAddr: outputTokenAddr,
+        inputAmount: inputAmount,
+        outputAmount: outputAmount,
+        orderType: 0,
+        tradeType: tradeType === TradeType.BUY ? 0 : 1,
+      };
+      return this.limitOrder.limitOrder(_orderInputToken, this.account);
+    }
+  };
+
+  cancelLimitOrder = (pairAddress: string, orderID: number) => {
+    if (!pairAddress || !orderID) throw new Error('Params input error.');
+    const params = {
+      orderID: orderID,
+      pairAddr: pairAddress,
+    } as SMCParams.CancelOrder;
+    return this.limitOrder.cancelOrder(params, this.account);
+  };
 }

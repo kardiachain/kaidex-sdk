@@ -9,6 +9,21 @@ export enum TradeInputType {
 }
 
 export declare namespace InputParams {
+  interface CalculateOutputAmount {
+    amountIn: number | string;
+    tradeInputType: TradeInputType;
+    tokenA: Token;
+    tokenB: Token;
+  }
+
+  interface CalculatePriceImpact {
+    tokenA: Token;
+    tokenB: Token;
+    inputAmount: string;
+    estimateOutput: string;
+    tradeInputType: TradeInputType;
+  }
+
   interface AddLiquidity {
     inputAmount: string | number;
     outputAmount: string | number;
@@ -38,18 +53,11 @@ export declare namespace InputParams {
     txDeadline: string | number;
   }
 
-  interface CalculateOutputAmount {
-    amountIn: number | string;
-    tradeInputType: TradeInputType;
+  interface LimitOrder {
+    amount: string | number;
+    total: string | number;
     tokenA: Token;
     tokenB: Token;
-  }
-
-  interface CalculatePriceImpact {
-    tokenA: Token;
-    tokenB: Token;
-    inputAmount: string;
-    estimateOutput: string;
-    tradeInputType: TradeInputType;
+    tradeType: TradeType;
   }
 }

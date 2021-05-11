@@ -82,7 +82,7 @@ declare namespace SMCParams {
     maximumInputAmountInDecimal: string;
   }
 
-  interface OrderInputKAI {
+  interface LimitOrderKAI {
     outputTokenAddr: string;
     outputAmount: string;
     orderType: 0 | 1;
@@ -90,7 +90,7 @@ declare namespace SMCParams {
     tradeType: 0 | 1;
   }
 
-  interface OrderInputTokens {
+  interface LimitOrder {
     inputTokenAddr: string;
     inputAmount: string;
     outputTokenAddr: string;

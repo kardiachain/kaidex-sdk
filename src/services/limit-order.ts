@@ -2,14 +2,14 @@ import { methodNames } from '../constants';
 import { AbstractSmcService } from '../entities';
 
 export class LimitOrderService extends AbstractSmcService {
-  orderInputKAI = async (
+  limitOrderKAI = async (
     {
       outputTokenAddr,
       outputAmount,
       orderType,
       kaiAmountIn,
       tradeType,
-    }: SMCParams.OrderInputKAI,
+    }: SMCParams.LimitOrderKAI,
     account?: KAIAccount
   ): Promise<any> => {
     const arg = {
@@ -22,7 +22,7 @@ export class LimitOrderService extends AbstractSmcService {
     return this.processSmcParams(arg, account);
   };
 
-  orderInputTokens = async (
+  limitOrder = async (
     {
       inputAmount,
       inputTokenAddr,
@@ -30,7 +30,7 @@ export class LimitOrderService extends AbstractSmcService {
       outputTokenAddr,
       orderType,
       tradeType,
-    }: SMCParams.OrderInputTokens,
+    }: SMCParams.LimitOrder,
     account?: KAIAccount
   ): Promise<any> => {
     const arg = {
