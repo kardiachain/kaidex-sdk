@@ -10,8 +10,8 @@ export const DEFAULT_GAS_LIMIT = 10000000;
 export const DEFAULT_GAS_PRICE = 2000000000;
 export const MINIMUM_TOKEN_AMOUNT = 0.00001;
 
-export const KAI_TOKEN_SYMBOL = 'Kardiachain';
-export const KAI_TOKEN_NAME = 'KAI';
+export const KAI_TOKEN_SYMBOL = 'KAI';
+export const KAI_TOKEN_NAME = 'Kardiachain';
 
 export const abiJson = {
   ROUTER,
