@@ -19,7 +19,7 @@ export class KaidexClient extends KaidexService {
     this.account = account;
     const { privateKey, publicKey } = account;
 
-    if (!KardiaAccount.isAddress(publicKey) || !privateKey.trim())
+    if (props.account && (!KardiaAccount.isAddress(publicKey) || !privateKey.trim()))
       throw new Error('Invalid Account!');
   }
 
@@ -321,10 +321,7 @@ export class KaidexClient extends KaidexService {
 
   cancelLimitOrder = (pairAddress: string, orderID: number) => {
     if (!pairAddress || !orderID) throw new Error('Params input error.');
-    const params = {
-      orderID: orderID,
-      pairAddr: pairAddress,
-    } as SMCParams.CancelOrder;
+    const params = { orderID, pairAddress };
     return this.limitOrder.cancelOrder(params, this.account);
   };
 }

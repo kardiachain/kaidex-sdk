@@ -1,11 +1,4 @@
 declare namespace SMCParams {
-  interface CallParams {
-    abi: any;
-    methodName: string;
-    args: (number | string | string[])[];
-    amount?: string;
-  }
-
   interface InvokeParams {
     amount?: string;
     gasLimit?: number;
@@ -100,7 +93,7 @@ declare namespace SMCParams {
   }
 
   interface CancelOrder {
-    pairAddr: string;
+    pairAddress: string;
     orderID: number;
   }
 }
