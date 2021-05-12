@@ -3,6 +3,8 @@ import {
   abiJson,
   endpoint as defaultEndpoint,
   smcAddresses as defaultAddresses,
+  KAI_TOKEN_NAME,
+  KAI_TOKEN_SYMBOL,
 } from '../constants';
 import {
   FactoryService,
@@ -87,6 +89,20 @@ export abstract class KaidexService {
       this.smcAddresses.wkai &&
       tokenAddress.toLowerCase() === this.smcAddresses.wkai.toLowerCase()
     );
+
+  public prepareTokenFormat = (token: Token): Token => {
+    return this.isKAI(token.tokenAddress)
+      ? {
+          ...token,
+          tokenAddress: this.smcAddresses.wkai,
+          name: KAI_TOKEN_NAME,
+          symbol: KAI_TOKEN_SYMBOL,
+          logo: token.logo,
+          wKAI: true,
+          decimals: 18,
+        }
+      : token;
+  };
 
   public calculateTransactionDeadline = async (
     txDeadline: string | number
