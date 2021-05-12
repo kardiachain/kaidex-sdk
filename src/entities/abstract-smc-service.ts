@@ -8,6 +8,7 @@ import KardiaClient, {
 import { DEFAULT_GAS_LIMIT, DEFAULT_GAS_PRICE } from '../constants';
 
 import KardiaContract from 'kardia-js-sdk/dist/smc';
+import { Utils } from '../utils';
 
 export abstract class AbstractSmcService {
   readonly abi: any;
@@ -115,8 +116,11 @@ export abstract class AbstractSmcService {
   };
 
   processSmcParams = (args: any, account?: KAIAccount): Promise<TxResponse> => {
-    if (!account || !account.publicKey || !account.privateKey)
-      return this.invokeSMC(args);
-    return this.smcSendAction({ ...args, account });
+    if (!account) return this.invokeSMC(args);
+    else {
+      const isValid = Utils.validateAccount(account);
+      if (!isValid) throw new Error('Invalid account');
+      return this.smcSendAction({ ...args, account });
+    }
   };
 }

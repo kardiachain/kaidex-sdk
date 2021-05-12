@@ -1,13 +1,37 @@
 import { methodNames } from '../constants';
 import JSBI from 'jsbi';
 import { AbstractSmcService } from '../entities';
+import { KardiaAccount } from 'kardia-js-sdk';
+
+const validatePath = (path: string[]): void => {
+  if (
+    !path ||
+    !path.length ||
+    !path[0] ||
+    !KardiaAccount.isAddress(path[0]) ||
+    !path[1] ||
+    !KardiaAccount.isAddress(path[1])
+  )
+    throw new Error('Invalid token address!');
+};
+
+const validateSwapParams = (params: SMCParams.SwapParams): void => {
+  const { exactAmount, path, addressTo, deadlineInMilliseconds } = params;
+
+  validatePath(path);
+  if (!KardiaAccount.isAddress(addressTo))
+    throw new Error('Invalid wallet address!');
+  if (!exactAmount) throw new Error('Invalid exact amount!');
+  if (!deadlineInMilliseconds) throw new Error('Invalid deadline');
+};
 
 export class RouterService extends AbstractSmcService {
   getReserves = async (
     tokenA: string,
     tokenB: string
   ): Promise<PooledTokens> => {
-    if (!tokenA.trim() || !tokenB.trim()) throw new Error('Invalid token!');
+    if (!KardiaAccount.isAddress(tokenA) || !KardiaAccount.isAddress(tokenB))
+      throw new Error('Invalid token!');
 
     const result = await this.smcCallData({
       abi: this.abi,
@@ -32,6 +56,14 @@ export class RouterService extends AbstractSmcService {
     }: SMCParams.AddLiquidity,
     account?: KAIAccount
   ): Promise<TxResponse> => {
+    if (!KardiaAccount.isAddress(walletAddress))
+      throw new Error('Invalid wallet address');
+    if (!KardiaAccount.isAddress(tokenA) || !KardiaAccount.isAddress(tokenB))
+      throw new Error('Invalid token address');
+    if (!amountADesired || !amountAMin || !amountBDesired || !amountBMin)
+      throw new Error('Invalid token amount');
+    if (!deadlineInMilliseconds) throw new Error('Invalid deadline');
+
     const args = {
       abi: this.abi,
       contractAddr: this.smcAddress,
@@ -63,6 +95,14 @@ export class RouterService extends AbstractSmcService {
     }: SMCParams.AddLiquidityKAI,
     account?: KAIAccount
   ): Promise<TxResponse> => {
+    if (!KardiaAccount.isAddress(walletAddress))
+      throw new Error('Invalid wallet address');
+    if (!KardiaAccount.isAddress(tokenAddress))
+      throw new Error('Invalid token address');
+    if (!amountKAI || !amountKAIMin || !amountTokenDesired || !amountTokenMin)
+      throw new Error('Invalid token amount');
+    if (!deadlineInMilliseconds) throw new Error('Invalid deadline');
+
     const args = {
       abi: this.abi,
       amount: amountKAI,
@@ -93,6 +133,14 @@ export class RouterService extends AbstractSmcService {
     }: SMCParams.RemoveLiquidity,
     account?: KAIAccount
   ): Promise<TxResponse> => {
+    if (!KardiaAccount.isAddress(walletAddress))
+      throw new Error('Invalid wallet address');
+    if (!KardiaAccount.isAddress(tokenA) || !KardiaAccount.isAddress(tokenB))
+      throw new Error('Invalid token address');
+    if (!liquidity) throw new Error('Invalid liquidity amount');
+    if (!amountAMin || !amountBMin) throw new Error('Invalid token amount');
+    if (!deadlineInMilliseconds) throw new Error('Invalid deadline');
+
     const args = {
       abi: this.abi,
       contractAddr: this.smcAddress,
@@ -121,6 +169,15 @@ export class RouterService extends AbstractSmcService {
     }: SMCParams.RemoveLiquidityKAI,
     account?: KAIAccount
   ): Promise<TxResponse> => {
+    if (!KardiaAccount.isAddress(walletAddress))
+      throw new Error('Invalid wallet address');
+    if (!KardiaAccount.isAddress(tokenAddress))
+      throw new Error('Invalid token address');
+    if (!liquidity) throw new Error('Invalid liquidity amount');
+    if (!amountKAIMin || !amountTokenMin)
+      throw new Error('Invalid token amount');
+    if (!deadlineInMilliseconds) throw new Error('Invalid deadline');
+
     const args = {
       abi: this.abi,
       contractAddr: this.smcAddress,
@@ -147,6 +204,14 @@ export class RouterService extends AbstractSmcService {
     }: SMCParams.OutputSwapParams,
     account?: KAIAccount
   ): Promise<TxResponse> => {
+    validateSwapParams({
+      exactAmount,
+      path,
+      addressTo,
+      deadlineInMilliseconds,
+    });
+    if (!minimumOutputAmountInDecimal) throw new Error('Invalid output Amount');
+
     const args = {
       abi: this.abi,
       contractAddr: this.smcAddress,
@@ -174,6 +239,14 @@ export class RouterService extends AbstractSmcService {
     }: SMCParams.InputSwapParams,
     account?: KAIAccount
   ): Promise<TxResponse> => {
+    validateSwapParams({
+      exactAmount,
+      path,
+      addressTo,
+      deadlineInMilliseconds,
+    });
+    if (!maximumInputAmountInDecimal) throw new Error('Invalid input Amount');
+
     const args = {
       abi: this.abi,
       contractAddr: this.smcAddress,
@@ -201,6 +274,14 @@ export class RouterService extends AbstractSmcService {
     }: SMCParams.OutputSwapParams,
     account?: KAIAccount
   ): Promise<TxResponse> => {
+    validateSwapParams({
+      exactAmount,
+      path,
+      addressTo,
+      deadlineInMilliseconds,
+    });
+    if (!minimumOutputAmountInDecimal) throw new Error('Invalid input Amount');
+
     const args = {
       abi: this.abi,
       contractAddr: this.smcAddress,
@@ -227,6 +308,14 @@ export class RouterService extends AbstractSmcService {
     }: SMCParams.OutputSwapParams,
     account?: KAIAccount
   ): Promise<TxResponse> => {
+    validateSwapParams({
+      exactAmount,
+      path,
+      addressTo,
+      deadlineInMilliseconds,
+    });
+    if (!minimumOutputAmountInDecimal) throw new Error('Invalid out Amount');
+
     const args = {
       abi: this.abi,
       contractAddr: this.smcAddress,
@@ -254,6 +343,14 @@ export class RouterService extends AbstractSmcService {
     }: SMCParams.InputSwapParams,
     account?: KAIAccount
   ): Promise<TxResponse> => {
+    validateSwapParams({
+      exactAmount,
+      path,
+      addressTo,
+      deadlineInMilliseconds,
+    });
+    if (!maximumInputAmountInDecimal) throw new Error('Invalid input Amount');
+
     const args = {
       abi: this.abi,
       contractAddr: this.smcAddress,
@@ -281,6 +378,14 @@ export class RouterService extends AbstractSmcService {
     }: SMCParams.InputSwapParams,
     account?: KAIAccount
   ): Promise<TxResponse> => {
+    validateSwapParams({
+      exactAmount,
+      path,
+      addressTo,
+      deadlineInMilliseconds,
+    });
+    if (!maximumInputAmountInDecimal) throw new Error('Invalid input Amount');
+
     const args = {
       abi: this.abi,
       contractAddr: this.smcAddress,
@@ -293,6 +398,8 @@ export class RouterService extends AbstractSmcService {
   };
 
   getAmountsOut = async (amountIn: string, path: string[]): Promise<string> => {
+    if (!amountIn) throw new Error('Invalid input amount!');
+    validatePath(path);
     const result = await this.smcCallData({
       abi: this.abi,
       contractAddr: this.smcAddress,
