@@ -79,7 +79,7 @@ const calculateSlippageValue = async (
   type: 'add' | 'sub'
 ): Promise<string> => {
   try {
-    const _value = value instanceof Fraction ? value : new Fraction(value);
+    const _value = value instanceof Fraction ? value : new Fraction(Utils.cellValue(value));
     const slippageFrac = new Fraction(
       cellValue(slippageTolerance),
       cellValue(100)
@@ -111,7 +111,7 @@ const calculateLiquidityProvidersFee = (amountIn: string | number): string => {
 
 const validateAccount = (account: KAIAccount): boolean => {
   const { privateKey, publicKey } = account;
-  return KardiaAccount.isAddress(publicKey) && !!privateKey.trim();
+  return !!KardiaAccount.isAddress(publicKey) && !!privateKey.trim();
 };
 
 export const Utils = {
