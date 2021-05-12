@@ -31,7 +31,7 @@ export class RouterService extends AbstractSmcService {
       deadlineInMilliseconds,
     }: SMCParams.AddLiquidity,
     account?: KAIAccount
-  ) => {
+  ): Promise<TxResponse> => {
     const args = {
       abi: this.abi,
       contractAddr: this.smcAddress,
@@ -62,7 +62,7 @@ export class RouterService extends AbstractSmcService {
       deadlineInMilliseconds,
     }: SMCParams.AddLiquidityKAI,
     account?: KAIAccount
-  ) => {
+  ): Promise<TxResponse> => {
     const args = {
       abi: this.abi,
       amount: amountKAI,
@@ -92,7 +92,7 @@ export class RouterService extends AbstractSmcService {
       deadlineInMilliseconds,
     }: SMCParams.RemoveLiquidity,
     account?: KAIAccount
-  ) => {
+  ): Promise<TxResponse> => {
     const args = {
       abi: this.abi,
       contractAddr: this.smcAddress,
@@ -120,7 +120,7 @@ export class RouterService extends AbstractSmcService {
       deadlineInMilliseconds,
     }: SMCParams.RemoveLiquidityKAI,
     account?: KAIAccount
-  ) => {
+  ): Promise<TxResponse> => {
     const args = {
       abi: this.abi,
       contractAddr: this.smcAddress,
@@ -146,7 +146,7 @@ export class RouterService extends AbstractSmcService {
       deadlineInMilliseconds,
     }: SMCParams.OutputSwapParams,
     account?: KAIAccount
-  ) => {
+  ): Promise<TxResponse> => {
     const args = {
       abi: this.abi,
       contractAddr: this.smcAddress,
@@ -173,7 +173,7 @@ export class RouterService extends AbstractSmcService {
       deadlineInMilliseconds,
     }: SMCParams.InputSwapParams,
     account?: KAIAccount
-  ) => {
+  ): Promise<TxResponse> => {
     const args = {
       abi: this.abi,
       contractAddr: this.smcAddress,
@@ -200,7 +200,7 @@ export class RouterService extends AbstractSmcService {
       deadlineInMilliseconds,
     }: SMCParams.OutputSwapParams,
     account?: KAIAccount
-  ) => {
+  ): Promise<TxResponse> => {
     const args = {
       abi: this.abi,
       contractAddr: this.smcAddress,
@@ -226,7 +226,7 @@ export class RouterService extends AbstractSmcService {
       deadlineInMilliseconds,
     }: SMCParams.OutputSwapParams,
     account?: KAIAccount
-  ) => {
+  ): Promise<TxResponse> => {
     const args = {
       abi: this.abi,
       contractAddr: this.smcAddress,
@@ -253,7 +253,7 @@ export class RouterService extends AbstractSmcService {
       deadlineInMilliseconds,
     }: SMCParams.InputSwapParams,
     account?: KAIAccount
-  ) => {
+  ): Promise<TxResponse> => {
     const args = {
       abi: this.abi,
       contractAddr: this.smcAddress,
@@ -280,7 +280,7 @@ export class RouterService extends AbstractSmcService {
       deadlineInMilliseconds,
     }: SMCParams.InputSwapParams,
     account?: KAIAccount
-  ) => {
+  ): Promise<TxResponse> => {
     const args = {
       abi: this.abi,
       contractAddr: this.smcAddress,

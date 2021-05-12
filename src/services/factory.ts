@@ -2,7 +2,7 @@ import { methodNames } from '../constants';
 import { AbstractSmcService } from '../entities';
 
 export class FactoryService extends AbstractSmcService {
-  getPair = (tokenA: string, tokenB: string) => {
+  getPair = (tokenA: string, tokenB: string): Promise<string> => {
     if (!tokenA.trim() || !tokenB.trim()) throw new Error('Invalid token!');
 
     return this.smcCallData({

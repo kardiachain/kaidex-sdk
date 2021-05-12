@@ -1,41 +1,39 @@
 import { KaidexService } from './kaidex-service';
-import { KardiaAccount } from 'kardia-js-sdk';
 import JSBI from 'jsbi';
 import { methodNames, MINIMUM_TOKEN_AMOUNT } from '../constants';
 import { Utils } from '../utils';
-import { InputParams } from '../types/input-params';
-import { TradeType, TradeInputType } from '../types/input-params';
+import { InputParams, TradeInputType, TradeType } from '../types/input-params';
 import { Fraction } from './fraction';
 
 export class KaidexClient extends KaidexService {
   private account: KAIAccount;
 
-  constructor(props: KaidexOptions) {
-    super(props);
+  constructor({ account, abis, smcAddresses, rpcEndpoint }: KaidexOptions) {
+    super({ abis, smcAddresses, rpcEndpoint });
 
-    const account = props.account
-      ? props.account
-      : { privateKey: '', publicKey: '' };
-    this.account = account;
-    const { privateKey, publicKey } = account;
-
-    if (props.account && (!KardiaAccount.isAddress(publicKey) || !privateKey.trim()))
+    if (account && Utils.validateAccount(account))
       throw new Error('Invalid Account!');
+
+    this.account = account || { privateKey: '', publicKey: '' };
   }
 
-  updateAccount = (account: KAIAccount) => (this.account = account);
+  updateAccount = (account: KAIAccount): void => {
+    const isValid = Utils.validateAccount(account);
+    if (!isValid) throw new Error('Invalid Account!');
+    this.account = account;
+  };
 
-  getPair = (tokenA: string, tokenB: string) =>
+  getPair = (tokenA: string, tokenB: string): Promise<string> =>
     this.factory.getPair(tokenA, tokenB);
 
-  approveToken = (tokenAddress: string): Promise<any> =>
+  approveToken = (tokenAddress: string): Promise<TxResponse> =>
     this.krc20.approveToken(tokenAddress, this.account);
 
   getApprovalState = async (
     tokenAddr: string,
     walletAddress: string,
     amountToCheck: string | number
-  ): Promise<any> => {
+  ): Promise<boolean> => {
     const amount = Number(amountToCheck) || MINIMUM_TOKEN_AMOUNT;
     const currentAllowance = await this.krc20.getAllowance(
       tokenAddr,
@@ -48,14 +46,19 @@ export class KaidexClient extends KaidexService {
     );
   };
 
-  getTokenBalance = (tokenAddress: string, walletAddress: string) => {
+  getTokenBalance = (
+    tokenAddress: string,
+    walletAddress: string
+  ): Promise<string> => {
     const _walletAddress = walletAddress
       ? walletAddress
       : this.account.publicKey;
     return this.krc20.balanceOf(tokenAddress, _walletAddress);
   };
 
-  addLiquidity = async (params: InputParams.AddLiquidity) => {
+  addLiquidity = async (
+    params: InputParams.AddLiquidity
+  ): Promise<TxResponse> => {
     const { tokenA, tokenB } = params;
 
     if (this.isKAI(tokenA.tokenAddress) || this.isKAI(tokenB.tokenAddress)) {
@@ -71,7 +74,9 @@ export class KaidexClient extends KaidexService {
     return this.router.addLiquidity(addLiquidityKAIParams);
   };
 
-  removeLiquidity = async (params: InputParams.RemoveLiquidity) => {
+  removeLiquidity = async (
+    params: InputParams.RemoveLiquidity
+  ): Promise<TxResponse> => {
     const { tokenA, tokenB } = params.pair;
     // For KAI Pairs
     if (this.isKAI(tokenA.tokenAddress) || this.isKAI(tokenB.tokenAddress)) {
@@ -122,7 +127,7 @@ export class KaidexClient extends KaidexService {
     inputAmount,
     estimateOutput,
     tradeInputType,
-  }: InputParams.CalculatePriceImpact) => {
+  }: InputParams.CalculatePriceImpact): Promise<string> => {
     const inputToken =
       tradeInputType === TradeInputType.AMOUNT ? tokenA : tokenB;
     const outputToken =
@@ -192,7 +197,7 @@ export class KaidexClient extends KaidexService {
     pair,
     tradeInputType,
     tradeType,
-  }: InputParams.MarketSwap) => {
+  }: InputParams.MarketSwap): Promise<TxResponse> => {
     if (!inputAmount || !outputAmount || !addressTo || !pair)
       throw new Error('Params input error.');
     const isReserve = tradeType === TradeType.BUY;
@@ -268,6 +273,8 @@ export class KaidexClient extends KaidexService {
           { ...args, maximumInputAmountInDecimal },
           this.account
         );
+      default:
+        throw new Error('Invalid swap method!');
     }
   };
 
@@ -277,7 +284,7 @@ export class KaidexClient extends KaidexService {
     tokenA,
     tokenB,
     tradeType,
-  }: InputParams.LimitOrder) => {
+  }: InputParams.LimitOrder): Promise<TxResponse> => {
     const inputToken = tradeType === TradeType.BUY ? tokenB : tokenA;
     const outputToken = tradeType === TradeType.BUY ? tokenA : tokenB;
     const {
@@ -319,7 +326,10 @@ export class KaidexClient extends KaidexService {
     }
   };
 
-  cancelLimitOrder = (pairAddress: string, orderID: number) => {
+  cancelLimitOrder = (
+    pairAddress: string,
+    orderID: number
+  ): Promise<TxResponse> => {
     if (!pairAddress || !orderID) throw new Error('Params input error.');
     const params = { orderID, pairAddress };
     return this.limitOrder.cancelOrder(params, this.account);

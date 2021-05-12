@@ -114,7 +114,7 @@ export abstract class AbstractSmcService {
     });
   };
 
-  processSmcParams = (args: any, account?: KAIAccount) => {
+  processSmcParams = (args: any, account?: KAIAccount): Promise<TxResponse> => {
     if (!account || !account.publicKey || !account.privateKey)
       return this.invokeSMC(args);
     return this.smcSendAction({ ...args, account });

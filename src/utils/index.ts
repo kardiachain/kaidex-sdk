@@ -1,5 +1,6 @@
 import JSBI from 'jsbi';
 import { Fraction } from '../entities/fraction';
+import { KardiaAccount } from 'kardia-js-sdk';
 
 // const ZERO = JSBI.BigInt(0)
 export const ONE = JSBI.BigInt(1);
@@ -52,7 +53,7 @@ const convertValueFollowDecimal = (
   }
 };
 
-const removeTrailingZeros = (value: any) => {
+const removeTrailingZeros = (value: any): string => {
   const regEx1 = /^[0]+/;
   const regEx2 = /[0]+$/;
   const regEx3 = /[.]$/;
@@ -108,9 +109,15 @@ const calculateLiquidityProvidersFee = (amountIn: string | number): string => {
     .toFixed();
 };
 
+const validateAccount = (account: KAIAccount): boolean => {
+  const { privateKey, publicKey } = account;
+  return !KardiaAccount.isAddress(publicKey) || !privateKey.trim();
+};
+
 export const Utils = {
   cellValue,
   convertValueFollowDecimal,
   calculateSlippageValue,
   calculateLiquidityProvidersFee,
+  validateAccount,
 };

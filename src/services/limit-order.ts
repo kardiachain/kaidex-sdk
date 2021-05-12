@@ -11,7 +11,7 @@ export class LimitOrderService extends AbstractSmcService {
       tradeType,
     }: SMCParams.LimitOrderKAI,
     account?: KAIAccount
-  ): Promise<any> => {
+  ): Promise<TxResponse> => {
     const arg = {
       abi: this.abi,
       contractAddr: this.smcAddress,
@@ -32,7 +32,7 @@ export class LimitOrderService extends AbstractSmcService {
       tradeType,
     }: SMCParams.LimitOrder,
     account?: KAIAccount
-  ): Promise<any> => {
+  ): Promise<TxResponse> => {
     const arg = {
       abi: this.abi,
       contractAddr: this.smcAddress,
@@ -50,14 +50,14 @@ export class LimitOrderService extends AbstractSmcService {
   };
 
   cancelOrder = async (
-    { pairAddr, orderID }: SMCParams.CancelOrder,
+    { pairAddress, orderID }: SMCParams.CancelOrder,
     account?: KAIAccount
-  ): Promise<any> => {
+  ): Promise<TxResponse> => {
     const arg = {
       abi: this.abi,
       contractAddr: this.smcAddress,
       methodName: methodNames.CANCEL_ORDER,
-      params: [pairAddr, orderID],
+      params: [pairAddress, orderID],
     };
     return this.processSmcParams(arg, account);
   };
