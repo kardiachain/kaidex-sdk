@@ -6,7 +6,7 @@ import { InputParams, TradeInputType, TradeType } from '../types/input-params';
 import { Fraction } from './fraction';
 
 export class KaidexClient extends KaidexService {
-  private account: KAIAccount;
+  private account: KAIAccount | undefined;
 
   constructor({ account, abis, smcAddresses, rpcEndpoint }: KaidexOptions) {
     super({ abis, smcAddresses, rpcEndpoint });
@@ -14,7 +14,7 @@ export class KaidexClient extends KaidexService {
     if (account && Utils.validateAccount(account))
       throw new Error('Invalid Account!');
 
-    this.account = account || { privateKey: '', publicKey: '' };
+    this.account = account;
   }
 
   updateAccount = (account: KAIAccount): void => {
@@ -26,8 +26,11 @@ export class KaidexClient extends KaidexService {
   getPair = (tokenA: string, tokenB: string): Promise<string> =>
     this.factory.getPair(tokenA, tokenB);
 
-  approveToken = (tokenAddress: string): Promise<TxResponse> =>
-    this.krc20.approveToken(tokenAddress, this.account);
+  approveToken = (
+    token: Token,
+    amount?: string | number
+  ): Promise<TxResponse> =>
+    this.krc20.approveToken({ token, amount, account: this.account });
 
   getApprovalState = async (
     tokenAddr: string,
@@ -50,10 +53,7 @@ export class KaidexClient extends KaidexService {
     tokenAddress: string,
     walletAddress: string
   ): Promise<string> => {
-    const _walletAddress = walletAddress
-      ? walletAddress
-      : this.account.publicKey;
-    return this.krc20.balanceOf(tokenAddress, _walletAddress);
+    return this.krc20.balanceOf(tokenAddress, walletAddress);
   };
 
   addLiquidity = async (
