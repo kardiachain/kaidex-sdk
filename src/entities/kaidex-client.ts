@@ -214,6 +214,7 @@ export class KaidexClient extends KaidexService {
       tradeType,
       tradeInputType
     );
+    console.log('Swap method name:', methodName)
     let inputToken = !isReserve ? pair.tokenA : pair.tokenB;
     let outputToken = !isReserve ? pair.tokenB : pair.tokenA;
 
