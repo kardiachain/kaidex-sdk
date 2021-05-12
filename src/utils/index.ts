@@ -111,7 +111,7 @@ const calculateLiquidityProvidersFee = (amountIn: string | number): string => {
 
 const validateAccount = (account: KAIAccount): boolean => {
   const { privateKey, publicKey } = account;
-  return !KardiaAccount.isAddress(publicKey) || !privateKey.trim();
+  return KardiaAccount.isAddress(publicKey) && !!privateKey.trim();
 };
 
 export const Utils = {

@@ -11,7 +11,7 @@ export class KaidexClient extends KaidexService {
   constructor({ account, abis, smcAddresses, rpcEndpoint }: KaidexOptions) {
     super({ abis, smcAddresses, rpcEndpoint });
 
-    if (account && Utils.validateAccount(account))
+    if (account && !Utils.validateAccount(account))
       throw new Error('Invalid Account!');
 
     this.account = account;
