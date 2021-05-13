@@ -408,4 +408,16 @@ export class RouterService extends AbstractSmcService {
     });
     return result && result.length > 0 ? JSBI.BigInt(result[1]).toString() : '';
   };
+
+  getAmountsIn = async (amountOut: string, path: string[]): Promise<string> => {
+    if (!amountOut) throw new Error('Invalid input amount!');
+    validatePath(path);
+    const result = await this.smcCallData({
+      abi: this.abi,
+      contractAddr: this.smcAddress,
+      methodName: methodNames.GET_AMOUNTS_IN,
+      params: [amountOut, path],
+    });
+    return result && result.length > 0 ? JSBI.BigInt(result[0]).toString() : '';
+  };
 }

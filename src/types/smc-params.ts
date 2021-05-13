@@ -1,4 +1,9 @@
 declare namespace SMCParams {
+  interface CallParams {
+    methodName: string;
+    args: (string | string[] | number)[];
+    amount?: number | string;
+  }
   interface InvokeParams {
     amount?: string;
     gasLimit?: number;

@@ -2,35 +2,17 @@ import { KaidexService } from './kaidex-service';
 import JSBI from 'jsbi';
 import { methodNames, MINIMUM_TOKEN_AMOUNT } from '../constants';
 import { Utils } from '../utils';
-import { InputParams, TradeInputType, TradeType } from '../types/input-params';
+import { InputParams, InputType } from '../types/input-params';
 import { Fraction } from './fraction';
 
 export class KaidexClient extends KaidexService {
-  private account: KAIAccount | undefined;
 
-  constructor({ account, abis, smcAddresses, rpcEndpoint }: KaidexOptions) {
+  constructor({abis, smcAddresses, rpcEndpoint }: KaidexOptions) {
     super({ abis, smcAddresses, rpcEndpoint });
-
-    if (account && !Utils.validateAccount(account))
-      throw new Error('Invalid Account!');
-
-    this.account = account;
   }
-
-  updateAccount = (account: KAIAccount): void => {
-    const isValid = Utils.validateAccount(account);
-    if (!isValid) throw new Error('Invalid Account!');
-    this.account = account;
-  };
 
   getPair = (tokenA: string, tokenB: string): Promise<string> =>
     this.factory.getPair(tokenA, tokenB);
-
-  approveToken = (
-    token: Token,
-    amount?: string | number
-  ): Promise<TxResponse> =>
-    this.krc20.approveToken({ token, amount, account: this.account });
 
   getApprovalState = async (
     tokenAddr: string,
@@ -38,11 +20,7 @@ export class KaidexClient extends KaidexService {
     amountToCheck: string | number
   ): Promise<boolean> => {
     const amount = Number(amountToCheck) || MINIMUM_TOKEN_AMOUNT;
-    const currentAllowance = await this.krc20.getAllowance(
-      tokenAddr,
-      walletAddress
-    );
-
+    const currentAllowance = await this.krc20.getAllowance(tokenAddr, walletAddress);
     return JSBI.lessThan(
       currentAllowance,
       JSBI.BigInt(Utils.cellValue(amount))
@@ -56,110 +34,94 @@ export class KaidexClient extends KaidexService {
     return this.krc20.balanceOf(tokenAddress, walletAddress);
   };
 
-  addLiquidity = async (
-    params: InputParams.AddLiquidity
-  ): Promise<TxResponse> => {
-    const { tokenA, tokenB } = params;
+  // addLiquidity = async (
+  //   params: InputParams.AddLiquidity
+  // ): Promise<TxResponse> => {
+  //   const { tokenA, tokenB } = params;
 
-    if (this.isKAI(tokenA.tokenAddress) || this.isKAI(tokenB.tokenAddress)) {
-      const addLiquidityParams = await this.transformAddLiquidityKAIParams(
-        params
-      );
-      return this.router.addLiquidityKAI(addLiquidityParams);
-    }
+  //   if (this.isKAI(tokenA.tokenAddress) || this.isKAI(tokenB.tokenAddress)) {
+  //     const addLiquidityParams = await this.transformAddLiquidityKAIParams(
+  //       params
+  //     );
+  //     return this.router.addLiquidityKAI(addLiquidityParams);
+  //   }
 
-    const addLiquidityKAIParams = await this.transformAddLiquidityParams(
-      params
-    );
-    return this.router.addLiquidity(addLiquidityKAIParams);
-  };
+  //   const addLiquidityKAIParams = await this.transformAddLiquidityParams(
+  //     params
+  //   );
+  //   return this.router.addLiquidity(addLiquidityKAIParams);
+  // };
 
-  removeLiquidity = async (
-    params: InputParams.RemoveLiquidity
-  ): Promise<TxResponse> => {
-    const { tokenA, tokenB } = params.pair;
-    // For KAI Pairs
-    if (this.isKAI(tokenA.tokenAddress) || this.isKAI(tokenB.tokenAddress)) {
-      const removeLiquidityKAIParams = await this.transformRemoveLiquidityKAIParams(
-        params
-      );
-      return this.router.removeLiquidityKAI(
-        removeLiquidityKAIParams,
-        this.account
-      );
-    }
-    const removeLiquidityParams = await this.transformRemoveLiquidityParams(
-      params
-    );
-    return this.router.removeLiquidity(removeLiquidityParams, this.account);
-  };
+  // removeLiquidity = async (
+  //   params: InputParams.RemoveLiquidity
+  // ): Promise<TxResponse> => {
+  //   const { tokenA, tokenB } = params.pair;
+  //   // For KAI Pairs
+  //   if (this.isKAI(tokenA.tokenAddress) || this.isKAI(tokenB.tokenAddress)) {
+  //     const removeLiquidityKAIParams = await this.transformRemoveLiquidityKAIParams(
+  //       params
+  //     );
+  //     return this.router.removeLiquidityKAI(
+  //       removeLiquidityKAIParams,
+  //       this.account
+  //     );
+  //   }
+  //   const removeLiquidityParams = await this.transformRemoveLiquidityParams(
+  //     params
+  //   );
+  //   return this.router.removeLiquidity(removeLiquidityParams, this.account);
+  // };
 
   calculateOutputAmount = async ({
-    amountIn,
-    tradeInputType,
-    tokenA,
-    tokenB,
+    amount,
+    tokenIn,
+    tokenOut,
+    inputType,
   }: InputParams.CalculateOutputAmount): Promise<string> => {
-    if (
-      !amountIn ||
-      !tokenA.tokenAddress ||
-      !tokenB.tokenAddress ||
-      tokenA.decimals === undefined ||
-      tokenB.decimals === undefined
-    )
-      throw new Error('Params input error.');
+    if (!amount || !tokenIn || !tokenOut) throw new Error('Params input error.')
+    const { tokenAddress: tokenInAddr, decimals: tokenInDec } = tokenIn
+    const { tokenAddress: tokenOutAddr, decimals: tokenOutDec } = tokenOut
+    const amountDec = Utils.cellValue(amount, tokenInDec)
+    const path = Utils.renderPair(tokenInAddr, tokenOutAddr)
+    let amountOutDec = '';
+    let decimals;
 
-    const amountInDec =
-      tradeInputType === TradeInputType.AMOUNT
-        ? Utils.cellValue(amountIn, tokenA.decimals)
-        : Utils.cellValue(amountIn, tokenB.decimals);
-    const path =
-      tradeInputType === TradeInputType.AMOUNT
-        ? [tokenA.tokenAddress, tokenB.tokenAddress]
-        : [tokenB.tokenAddress, tokenA.tokenAddress];
-
-    return this.router.getAmountsOut(amountInDec, path);
+    switch (inputType) {
+      case InputType.EXACT_IN:
+          amountOutDec = await this.router.getAmountsOut(amountDec, path)
+          decimals = tokenOutDec
+          break;
+      case InputType.EXACT_OUT:
+          amountOutDec = await this.router.getAmountsIn(amountDec, path)
+          decimals = tokenInDec
+          break;
+    }
+    return Utils.convertValueFollowDecimal(amountOutDec, decimals)
   };
 
   calculatePriceImpact = async ({
-    tokenA,
-    tokenB,
-    inputAmount,
-    estimateOutput,
-    tradeInputType,
+    tokenIn,
+    tokenOut,
+    amountIn,
+    amountOut,
   }: InputParams.CalculatePriceImpact): Promise<string> => {
-    const inputToken =
-      tradeInputType === TradeInputType.AMOUNT ? tokenA : tokenB;
-    const outputToken =
-      tradeInputType === TradeInputType.AMOUNT ? tokenB : tokenA;
+    if (!tokenIn || !tokenOut || !amountIn || !amountOut) throw new Error("Params input error.")
+    const { decimals: tokenInDec, tokenAddress: tokenInAddr } = tokenIn
+    const { decimals: tokenOutDec,  tokenAddress: tokenOutAddr } = tokenOut
 
-    const { reserveA, reserveB } = await this.router.getReserves(
-      inputToken.tokenAddress,
-      outputToken.tokenAddress
-    );
+    const { reserveA, reserveB } = await this.router.getReserves(tokenInAddr, tokenOutAddr);
+    if (!reserveA || reserveA === '0' || !reserveB || reserveB === '0') return '0';
 
-    if (!reserveA || reserveA === '0' || !reserveB || reserveB === '0')
-      return '0';
+    const amountInDec = Utils.cellValue(amountIn, tokenInDec)
+    const amountOutDec = Utils.cellValue(amountOut, tokenInDec)
 
-    const inputAmountInDecimal = Utils.cellValue(
-      inputAmount,
-      inputToken.decimals
-    );
-    const midPrice = tokenA
-      ? new Fraction(reserveB).divide(reserveA)
-      : new Fraction(0);
-    const inputAmountFrac = new Fraction(
-      inputAmountInDecimal,
-      JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(inputToken.decimals))
-    );
-    const estimateOutputFrac = new Fraction(
-      estimateOutput,
-      JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(outputToken.decimals))
-    );
-    const exactQuote = midPrice.multiply(inputAmountFrac);
-    const slippage = exactQuote.subtract(estimateOutputFrac).divide(exactQuote);
+    const midPrice = reserveA ? new Fraction(reserveB).divide(reserveA) : new Fraction(0);
+    const amountInFrac = new Fraction(amountInDec, JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(tokenInDec)))
+    const amountOutFrac = new Fraction(amountOutDec, JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(tokenOutDec)))
 
-    return slippage.multiply(100).toFixed(5);
+    const exactQuote = midPrice.multiply(amountInFrac)
+    const slippage = exactQuote.subtract(amountOutFrac).divide(exactQuote)
+    return slippage.multiply(100).toFixed(5)
   };
 
   public calculateExchangeRate = async (
@@ -170,7 +132,6 @@ export class KaidexClient extends KaidexService {
       tokenA.tokenAddress,
       tokenB.tokenAddress
     );
-
     const tokenAValue = Utils.convertValueFollowDecimal(
       JSBI.BigInt(reserveA).toString(),
       tokenA.decimals
@@ -179,160 +140,115 @@ export class KaidexClient extends KaidexService {
       JSBI.BigInt(reserveB).toString(),
       tokenB.decimals
     );
-
     const _tokenAValue = Number(tokenAValue);
     const _tokenBValue = Number(tokenBValue);
     const rateAB = _tokenAValue ? _tokenBValue / _tokenAValue : 0;
     const rateBA = _tokenBValue ? _tokenAValue / _tokenBValue : 0;
-
     return { rateAB, rateBA };
   };
 
-  marketSwap = async ({
-    txDeadline,
-    slippageTolerance,
-    inputAmount,
-    outputAmount,
+  marketSwapCallParameters = ({
+    amountIn,
+    amountOut,
+    tokenIn,
+    tokenOut,
     addressTo,
-    pair,
-    tradeInputType,
-    tradeType,
-  }: InputParams.MarketSwap): Promise<TxResponse> => {
-    if (!inputAmount || !outputAmount || !addressTo || !pair)
-      throw new Error('Params input error.');
-    const isReserve = tradeType === TradeType.BUY;
+    inputType,
+    txDeadline,
+    slippageTolerance
+  }: InputParams.MarketSwap): SMCParams.CallParams => {
+    if (!amountIn || !amountOut || !addressTo || !tokenIn || !tokenOut) throw new Error("Params input error.")
+    const kaiIn = this.isKAI(tokenIn.tokenAddress)
+    const kaiOut = this.isKAI(tokenOut.tokenAddress)
+    const amountInDec = Utils.cellValue(amountIn, tokenIn.decimals)
+    const amountOutDec = Utils.cellValue(amountOut, tokenOut.decimals)
+    const amountOutMinDec = Utils.calculateSlippageValue(amountOutDec, slippageTolerance, 'sub')
+    const amountInMaxDec = Utils.calculateSlippageValue(amountInDec, slippageTolerance, 'add')
+    const path = Utils.renderPair(tokenIn.tokenAddress, tokenOut.tokenAddress)
 
-    const deadlineInMilliseconds: number = await this.calculateTransactionDeadline(
-      txDeadline
-    );
-
-    const { tokenA, tokenB } = pair;
-
-    const methodName = this.findSwapType(
-      tokenA.tokenAddress,
-      tokenB.tokenAddress,
-      tradeType,
-      tradeInputType
-    );
-    console.log('Swap method name:', methodName)
-    let inputToken = !isReserve ? pair.tokenA : pair.tokenB;
-    let outputToken = !isReserve ? pair.tokenB : pair.tokenA;
-
-    let exactAmount = Utils.cellValue(inputAmount, inputToken.decimals);
-    let minimumOutputAmountInDecimal = await Utils.calculateSlippageValue(
-      outputAmount,
-      slippageTolerance,
-      'sub'
-    );
-    let maximumInputAmountInDecimal = await Utils.calculateSlippageValue(
-      outputAmount,
-      slippageTolerance,
-      'add'
-    );
-    const path = [inputToken.tokenAddress, outputToken.tokenAddress];
-
-    const args = {
-      exactAmount,
-      path,
-      addressTo,
-      deadlineInMilliseconds,
-    };
-
-    switch (methodName) {
-      case methodNames.SWAP_EXACT_TOKENS_FOR_TOKENS:
-        return this.router.swapExactTokensForTokens(
-          { ...args, minimumOutputAmountInDecimal },
-          this.account
-        );
-
-      case methodNames.SWAP_TOKENS_FOR_EXACT_TOKENS:
-        return this.router.swapTokensForExactTokens(
-          { ...args, maximumInputAmountInDecimal },
-          this.account
-        );
-
-      case methodNames.SWAP_EXACT_KAI_FOR_TOKENS:
-        return this.router.swapExactKAIForTokens(
-          { ...args, minimumOutputAmountInDecimal },
-          this.account
-        );
-
-      case methodNames.SWAP_EXACT_TOKENS_FOR_KAI:
-        return this.router.swapExactTokensForKAI(
-          { ...args, minimumOutputAmountInDecimal },
-          this.account
-        );
-
-      case methodNames.SWAP_TOKENS_FOR_EXACT_KAI:
-        return this.router.swapTokensForExactKAI(
-          { ...args, maximumInputAmountInDecimal },
-          this.account
-        );
-
-      case methodNames.SWAP_KAI_FOR_EXACT_TOKENS:
-        return this.router.swapKAIForExactTokens(
-          { ...args, maximumInputAmountInDecimal },
-          this.account
-        );
-      default:
-        throw new Error('Invalid swap method!');
+    let swapParams: SMCParams.CallParams = {} as SMCParams.CallParams
+    switch (inputType) {
+      case InputType.EXACT_IN:
+        if (kaiIn) {
+          swapParams = {
+            methodName: methodNames.SWAP_EXACT_KAI_FOR_TOKENS,
+            args: [amountOutMinDec, path, addressTo, txDeadline],
+            amount: amountInDec
+          } as SMCParams.CallParams
+        } else if (kaiOut) {
+          swapParams = {
+            methodName: methodNames.SWAP_EXACT_TOKENS_FOR_KAI,
+            args: [amountInDec, amountOutMinDec, path, addressTo, txDeadline]
+          }
+        } else {
+          swapParams = {
+            methodName: methodNames.SWAP_EXACT_TOKENS_FOR_TOKENS,
+            args: [amountInDec, amountOutMinDec, path, addressTo, txDeadline]
+          }
+        }
+        break;
+      case InputType.EXACT_OUT:
+        if (kaiIn) {
+          swapParams = {
+            methodName: methodNames.SWAP_KAI_FOR_EXACT_TOKENS,
+            args: [amountOutDec, path, addressTo, txDeadline],
+            amount: amountInMaxDec
+          }
+        } else if (kaiOut) {
+          swapParams = {
+            methodName: methodNames.SWAP_TOKENS_FOR_EXACT_KAI,
+            args: [amountOutDec, amountInMaxDec, path, addressTo, txDeadline]
+          }
+        } else {
+          swapParams = {
+            methodName: methodNames.SWAP_TOKENS_FOR_EXACT_TOKENS,
+            args: [amountOutDec, amountOutMinDec, path, addressTo, txDeadline]
+          }
+        }
+        break;
     }
+    return swapParams
   };
 
-  placeLimitOrder = ({
-    amount,
-    total,
-    tokenA,
-    tokenB,
-    tradeType,
-  }: InputParams.LimitOrder): Promise<TxResponse> => {
-    const inputToken = tradeType === TradeType.BUY ? tokenB : tokenA;
-    const outputToken = tradeType === TradeType.BUY ? tokenA : tokenB;
-    const {
-      tokenAddress: inputTokenAddr,
-      decimals: inputTokenDecimals,
-    } = inputToken;
-    const {
-      tokenAddress: outputTokenAddr,
-      decimals: outputTokenDecimals,
-    } = outputToken;
-    const inputAmount =
-      tradeType === TradeType.BUY
-        ? Utils.cellValue(total, inputTokenDecimals)
-        : Utils.cellValue(amount, inputTokenDecimals);
-    const outputAmount =
-      tradeType === TradeType.BUY
-        ? Utils.cellValue(amount, outputTokenDecimals)
-        : Utils.cellValue(total, outputTokenDecimals);
+  limitOrderCallParameters = ({
+    amountIn,
+    amountOut,
+    tokenIn,
+    tokenOut,
+    inputType,
+    tradeType
+  }: InputParams.LimitOrder): SMCParams.CallParams => {
 
-    if (inputTokenAddr === this.smcAddresses.wkai) {
-      const _orderInputKai: SMCParams.LimitOrderKAI = {
-        outputAmount: outputAmount,
-        outputTokenAddr: outputTokenAddr,
-        kaiAmountIn: inputAmount,
-        orderType: 0,
-        tradeType: 0,
-      };
-      return this.limitOrder.limitOrderKAI(_orderInputKai, this.account);
+    if (!amountIn || !amountOut || !tokenIn || !tokenOut) throw new Error("Params input error.")
+    const { tokenAddress: tokenInAddr, decimals: tokenInDec } = tokenIn;
+    const { tokenAddress: tokenOutAddr,  decimals: tokenOutDec } = tokenOut;
+    const amountInDec = Utils.cellValue(amountIn, tokenInDec)
+    const amountOutDec = Utils.cellValue(amountOut, tokenOutDec)
+    const kaiIn = this.isKAI(tokenIn.tokenAddress)
+    let swapParams: SMCParams.CallParams = {} as SMCParams.CallParams
+    if (kaiIn) {
+      swapParams = {
+        methodName: methodNames.ORDER_INPUT_KAI,
+        args: [tokenOutAddr, amountOutDec, inputType, tradeType],
+        amount: amountInDec,
+      }
     } else {
-      const _orderInputToken: SMCParams.LimitOrder = {
-        inputTokenAddr: inputTokenAddr,
-        outputTokenAddr: outputTokenAddr,
-        inputAmount: inputAmount,
-        outputAmount: outputAmount,
-        orderType: 0,
-        tradeType: tradeType === TradeType.BUY ? 0 : 1,
-      };
-      return this.limitOrder.limitOrder(_orderInputToken, this.account);
+      swapParams = {
+        methodName: methodNames.ORDER_INPUT_TOKENS,
+        args: [tokenInAddr, amountInDec, tokenOutAddr, amountOutDec, inputType, tradeType]
+      }
     }
+    return swapParams
   };
 
   cancelLimitOrder = (
     pairAddress: string,
     orderID: number
-  ): Promise<TxResponse> => {
-    if (!pairAddress || !orderID) throw new Error('Params input error.');
-    const params = { orderID, pairAddress };
-    return this.limitOrder.cancelOrder(params, this.account);
+  ): SMCParams.CallParams => {
+    if (!pairAddress || !orderID) throw new Error('Params input error.')
+    return {
+      methodName: methodNames.CANCEL_ORDER,
+      args: [pairAddress, orderID]
+    } as SMCParams.CallParams
   };
 }

@@ -12,7 +12,6 @@ import {
   KRC20Service,
   LimitOrderService,
 } from '../services';
-import { TradeType, TradeInputType } from '../types/input-params';
 import { InputParams } from '../types/input-params';
 import { Utils } from '../utils';
 import { Fraction } from './fraction';
@@ -104,16 +103,7 @@ export abstract class KaidexService {
       : token;
   };
 
-  public calculateTransactionDeadline = async (
-    txDeadline: string | number
-  ): Promise<number> => {
-    const latestBlock = await this.kardiaClient.kaiChain.getBlockHeaderByHash(
-      'latest'
-    );
-    return new Date(latestBlock.time).getTime() + Number(txDeadline) * 60;
-  };
-
-  protected transformAddLiquidityParams = async (
+  protected transformAddLiquidityParams = (
     params: InputParams.AddLiquidity
   ) => {
     const {
@@ -133,20 +123,19 @@ export abstract class KaidexService {
       ? Utils.cellValue(outputAmount, tokenB.decimals)
       : '0';
     const calculatedAmountAMinInDec = inputAmount
-      ? await Utils.calculateSlippageValue(
+      ? Utils.calculateSlippageValue(
           amountADesiredInDec,
           slippageTolerance,
           'sub'
         )
       : '0';
     const calculatedAmountBMinInDec = outputAmount
-      ? await Utils.calculateSlippageValue(
+      ? Utils.calculateSlippageValue(
           amountBDesiredInDec,
           slippageTolerance,
           'sub'
         )
       : '0';
-    const deadline = await this.calculateTransactionDeadline(txDeadline);
 
     return {
       amountADesired: amountADesiredInDec,
@@ -156,7 +145,7 @@ export abstract class KaidexService {
       tokenA: tokenA.tokenAddress,
       tokenB: tokenB.tokenAddress,
       walletAddress,
-      deadlineInMilliseconds: deadline,
+      deadlineInMilliseconds: txDeadline,
     };
   };
 
@@ -228,7 +217,7 @@ export abstract class KaidexService {
       .multiply(withdrawPercent)
       .divide(100);
 
-    const _amountAMin = await Utils.calculateSlippageValue(
+    const _amountAMin = Utils.calculateSlippageValue(
       amountAMin,
       slippageTolerance,
       'sub'
@@ -245,12 +234,11 @@ export abstract class KaidexService {
       .multiply(withdrawPercent)
       .divide(100);
 
-    const _amountBMin = await Utils.calculateSlippageValue(
+    const _amountBMin = Utils.calculateSlippageValue(
       amountBMin,
       slippageTolerance,
       'sub'
     );
-    const deadline = await this.calculateTransactionDeadline(txDeadline);
 
     return {
       tokenA: tokenA.tokenAddress,
@@ -259,7 +247,7 @@ export abstract class KaidexService {
       amountAMin: _amountAMin,
       amountBMin: _amountBMin,
       walletAddress,
-      deadlineInMilliseconds: deadline,
+      deadlineInMilliseconds: txDeadline,
     };
   };
 
@@ -288,40 +276,5 @@ export abstract class KaidexService {
       walletAddress,
       deadlineInMilliseconds,
     };
-  };
-
-  protected findSwapType = (
-    tokenA: string,
-    tokenB: string,
-    tradeType: TradeType,
-    tradeInputType: TradeInputType
-  ) => {
-    const swap = 'swap';
-    const kai = 'KAI';
-    const _for = 'For';
-    const tokens = 'Tokens';
-    const exact = 'Exact';
-
-    let tokenNameA: string;
-    let tokenNameB: string;
-
-    const isKAIPair = this.isKAI(tokenA) || this.isKAI(tokenB);
-    const exactFirst =
-      (tradeType === TradeType.SELL &&
-        tradeInputType === TradeInputType.AMOUNT) ||
-      (tradeType === TradeType.BUY && tradeInputType === TradeInputType.TOTAL);
-
-    if (isKAIPair) {
-      const kaiFirst =
-        (tradeType === TradeType.BUY && this.isKAI(tokenB)) ||
-        (tradeType === TradeType.SELL && this.isKAI(tokenA));
-      tokenNameA = `${exactFirst ? exact : ''}${kaiFirst ? kai : tokens}`;
-      tokenNameB = `${exactFirst ? '' : exact}${kaiFirst ? tokens : kai}`;
-    } else {
-      tokenNameA = `${exactFirst ? exact : ''}${tokens}`;
-      tokenNameB = `${exactFirst ? '' : exact}${tokens}`;
-    }
-
-    return swap + tokenNameA + _for + tokenNameB;
   };
 }

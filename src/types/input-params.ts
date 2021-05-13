@@ -1,6 +1,6 @@
 export enum TradeType {
-  BUY = 'BUY',
-  SELL = 'SELL',
+  BUY = 0,
+  SELL = 1,
 }
 
 export enum TradeInputType {
@@ -8,20 +8,24 @@ export enum TradeInputType {
   TOTAL = 'TOTAL',
 }
 
+export enum InputType {
+  EXACT_IN = 0,
+  EXACT_OUT = 1
+}
+
 export declare namespace InputParams {
   interface CalculateOutputAmount {
-    amountIn: number | string;
-    tradeInputType: TradeInputType;
-    tokenA: Token;
-    tokenB: Token;
+    amount: number | string;
+    tokenIn: Token;
+    tokenOut: Token;
+    inputType: InputType
   }
 
   interface CalculatePriceImpact {
-    tokenA: Token;
-    tokenB: Token;
-    inputAmount: string;
-    estimateOutput: string;
-    tradeInputType: TradeInputType;
+    tokenIn: Token;
+    tokenOut: Token;
+    amountIn: string;
+    amountOut: string;
   }
 
   interface AddLiquidity {
@@ -43,21 +47,22 @@ export declare namespace InputParams {
   }
 
   interface MarketSwap {
-    inputAmount: string | number;
-    outputAmount: string | number;
+    amountIn: string;
+    amountOut: string;
+    tokenIn: Token;
+    tokenOut: Token;
     addressTo: string;
-    pair: Pair;
-    tradeInputType: TradeInputType;
-    tradeType: TradeType;
-    slippageTolerance: string | number;
+    inputType: InputType;
     txDeadline: string | number;
+    slippageTolerance: string | number;
   }
 
   interface LimitOrder {
-    amount: string | number;
-    total: string | number;
-    tokenA: Token;
-    tokenB: Token;
+    amountIn: string;
+    amountOut: string;
+    tokenIn: Token;
+    tokenOut: Token;
     tradeType: TradeType;
+    inputType: InputType;
   }
 }

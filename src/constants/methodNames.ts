@@ -5,6 +5,7 @@ export const methodNames = {
   //Router
   GET_RESERVES: 'getReserves',
   GET_AMOUNTS_OUT: 'getAmountsOut',
+  GET_AMOUNTS_IN: 'getAmountsIn',
   GET_TOTAL_KAI_AMOUNTS_IN: 'getTotalKAIAmountsIn',
   ADD_LIQUIDITY: 'addLiquidity',
   ADD_LIQUIDITY_KAI: 'addLiquidityKAI',

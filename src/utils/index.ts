@@ -73,11 +73,11 @@ const removeTrailingZeros = (value: any): string => {
   return after ? after : '0';
 };
 
-const calculateSlippageValue = async (
+const calculateSlippageValue = (
   value: Fraction | string | number,
   slippageTolerance: string | number,
   type: 'add' | 'sub'
-): Promise<string> => {
+): string => {
   try {
     const _value = value instanceof Fraction ? value : new Fraction(Utils.cellValue(value));
     const slippageFrac = new Fraction(
@@ -114,10 +114,16 @@ const validateAccount = (account: KAIAccount): boolean => {
   return !!KardiaAccount.isAddress(publicKey) && !!privateKey.trim();
 };
 
+const renderPair = (tokenIn: string, tokenOut: string): string[] => {
+  if (!tokenIn || !tokenOut) throw new Error('Error render pair: token not found!')
+  return [tokenIn, tokenOut]
+}
+
 export const Utils = {
   cellValue,
   convertValueFollowDecimal,
   calculateSlippageValue,
   calculateLiquidityProvidersFee,
   validateAccount,
+  renderPair
 };
