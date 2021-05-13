@@ -14,7 +14,6 @@ import {
 } from '../services';
 import { InputParams } from '../types/input-params';
 import { Utils } from '../utils';
-import { Fraction } from './fraction';
 
 export abstract class KaidexService {
   protected abiJSON: Required<ABIS>;
@@ -182,99 +181,99 @@ export abstract class KaidexService {
     };
   };
 
-  protected transformRemoveLiquidityParams = async (
-    params: InputParams.RemoveLiquidity
-  ) => {
-    const {
-      pair,
-      withdrawPercent,
-      walletAddress,
-      slippageTolerance,
-      txDeadline,
-    } = params;
-    const { tokenA, tokenB, balance, pairAddress } = pair;
+  // protected transformRemoveLiquidityParams = async (
+  //   params: InputParams.RemoveLiquidity
+  // ) => {
+  //   const {
+  //     pair,
+  //     withdrawPercent,
+  //     walletAddress,
+  //     slippageTolerance,
+  //     txDeadline,
+  //   } = params;
+  //   const { tokenA, tokenB, balance, pairAddress } = pair;
 
-    if (!Number(withdrawPercent)) throw new Error('Invalid amount!');
-    if (!walletAddress) throw new Error('Invalid wallet!');
-    if (!Number(balance)) throw new Error('Not enough balance!');
+  //   if (!Number(withdrawPercent)) throw new Error('Invalid amount!');
+  //   if (!walletAddress) throw new Error('Invalid wallet!');
+  //   if (!Number(balance)) throw new Error('Not enough balance!');
 
-    const totalSupply = await this.krc20.getTotalSupply(pairAddress);
+  //   const totalSupply = await this.krc20.getTotalSupply(pairAddress);
 
-    //liquidity = balance * withdrawPercent / 100
-    const liquidity = new Fraction(balance)
-      .multiply(withdrawPercent)
-      .divide(100)
-      .toFixed();
-    const tokenABalance = await this.krc20.balanceOf(
-      tokenA.tokenAddress,
-      pairAddress
-    );
+  //   //liquidity = balance * withdrawPercent / 100
+  //   const liquidity = new Fraction(balance)
+  //     .multiply(withdrawPercent)
+  //     .divide(100)
+  //     .toFixed();
+  //   const tokenABalance = await this.krc20.balanceOf(
+  //     tokenA.tokenAddress,
+  //     pairAddress
+  //   );
 
-    //amountAMin = (balance / totalSupply) * tokenABalance * withdrawPercent / 100
-    const amountAMin = new Fraction(balance)
-      .divide(totalSupply)
-      .multiply(tokenABalance)
-      .multiply(withdrawPercent)
-      .divide(100);
+  //   //amountAMin = (balance / totalSupply) * tokenABalance * withdrawPercent / 100
+  //   const amountAMin = new Fraction(balance)
+  //     .divide(totalSupply)
+  //     .multiply(tokenABalance)
+  //     .multiply(withdrawPercent)
+  //     .divide(100);
 
-    const _amountAMin = Utils.calculateSlippageValue(
-      amountAMin,
-      slippageTolerance,
-      'sub'
-    );
-    const tokenBBalance = await this.krc20.balanceOf(
-      tokenB.tokenAddress,
-      pairAddress
-    );
+  //   const _amountAMin = Utils.calculateSlippageValue(
+  //     amountAMin,
+  //     slippageTolerance,
+  //     'sub'
+  //   );
+  //   const tokenBBalance = await this.krc20.balanceOf(
+  //     tokenB.tokenAddress,
+  //     pairAddress
+  //   );
 
-    //amountBMin = (balance / totalSupply) * tokenBBalance * withdrawPercent / 100
-    const amountBMin = new Fraction(balance)
-      .divide(totalSupply)
-      .multiply(tokenBBalance)
-      .multiply(withdrawPercent)
-      .divide(100);
+  //   //amountBMin = (balance / totalSupply) * tokenBBalance * withdrawPercent / 100
+  //   const amountBMin = new Fraction(balance)
+  //     .divide(totalSupply)
+  //     .multiply(tokenBBalance)
+  //     .multiply(withdrawPercent)
+  //     .divide(100);
 
-    const _amountBMin = Utils.calculateSlippageValue(
-      amountBMin,
-      slippageTolerance,
-      'sub'
-    );
+  //   const _amountBMin = Utils.calculateSlippageValue(
+  //     amountBMin,
+  //     slippageTolerance,
+  //     'sub'
+  //   );
 
-    return {
-      tokenA: tokenA.tokenAddress,
-      tokenB: tokenB.tokenAddress,
-      liquidity: liquidity,
-      amountAMin: _amountAMin,
-      amountBMin: _amountBMin,
-      walletAddress,
-      deadlineInMilliseconds: txDeadline,
-    };
-  };
+  //   return {
+  //     tokenA: tokenA.tokenAddress,
+  //     tokenB: tokenB.tokenAddress,
+  //     liquidity: liquidity,
+  //     amountAMin: _amountAMin,
+  //     amountBMin: _amountBMin,
+  //     walletAddress,
+  //     deadlineInMilliseconds: txDeadline,
+  //   };
+  // };
 
-  protected transformRemoveLiquidityKAIParams = async (
-    params: InputParams.RemoveLiquidity
-  ) => {
-    const {
-      tokenA,
-      tokenB,
-      liquidity,
-      amountAMin,
-      amountBMin,
-      walletAddress,
-      deadlineInMilliseconds,
-    } = await this.transformRemoveLiquidityParams(params);
+  // protected transformRemoveLiquidityKAIParams = async (
+  //   params: InputParams.RemoveLiquidity
+  // ) => {
+  //   const {
+  //     tokenA,
+  //     tokenB,
+  //     liquidity,
+  //     amountAMin,
+  //     amountBMin,
+  //     walletAddress,
+  //     deadlineInMilliseconds,
+  //   } = await this.transformRemoveLiquidityParams(params);
 
-    const otherToken = this.isKAI(tokenA) ? tokenB : tokenA;
-    const amountKAIMin = this.isKAI(tokenA) ? amountAMin : amountBMin;
-    const amountTokenMin = this.isKAI(tokenA) ? amountBMin : amountAMin;
+  //   const otherToken = this.isKAI(tokenA) ? tokenB : tokenA;
+  //   const amountKAIMin = this.isKAI(tokenA) ? amountAMin : amountBMin;
+  //   const amountTokenMin = this.isKAI(tokenA) ? amountBMin : amountAMin;
 
-    return {
-      tokenAddress: otherToken,
-      liquidity: liquidity,
-      amountKAIMin: amountKAIMin,
-      amountTokenMin: amountTokenMin,
-      walletAddress,
-      deadlineInMilliseconds,
-    };
-  };
+  //   return {
+  //     tokenAddress: otherToken,
+  //     liquidity: liquidity,
+  //     amountKAIMin: amountKAIMin,
+  //     amountTokenMin: amountTokenMin,
+  //     walletAddress,
+  //     deadlineInMilliseconds,
+  //   };
+  // };
 }

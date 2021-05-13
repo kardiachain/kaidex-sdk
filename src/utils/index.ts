@@ -119,10 +119,6 @@ const renderPair = (tokenIn: string, tokenOut: string): string[] => {
   return [tokenIn, tokenOut]
 }
 
-const validateToken = (token: Token): boolean => {
-
-}
-
 export const Utils = {
   cellValue,
   convertValueFollowDecimal,
