@@ -1,4 +1,6 @@
-interface Pair {
+import { PooledTokens, Token } from "./index";
+
+export interface Pair {
   favorite?: boolean;
   name: string;
   price?: number;
@@ -13,7 +15,7 @@ interface Pair {
   liquidity?: string;
 }
 
-interface MyLiquidityPair {
+export interface MyLiquidityPair {
   balance: string;
   name: string;
   pairAddress: string;

@@ -4,10 +4,11 @@ import { methodNames, MINIMUM_TOKEN_AMOUNT } from '../constants';
 import { Utils } from '../utils';
 import { InputParams, InputType } from '../types/input-params';
 import { Fraction } from './fraction';
+import { KaidexOptions, SMCParams, Token } from '../types';
 
 export class KaidexClient extends KaidexService {
 
-  constructor({abis, smcAddresses, rpcEndpoint }: KaidexOptions) {
+  constructor({abis, smcAddresses, rpcEndpoint }: KaidexOptions = {}) {
     super({ abis, smcAddresses, rpcEndpoint });
   }
 
@@ -34,90 +35,88 @@ export class KaidexClient extends KaidexService {
     return this.krc20.balanceOf(tokenAddress, walletAddress);
   };
 
-  // addLiquidity = async (
-  //   params: InputParams.AddLiquidity
-  // ): Promise<TxResponse> => {
-  //   const { tokenA, tokenB } = params;
+  addLiquidityCallParameters = (
+    params: InputParams.AddLiquidity
+  ): SMCParams.CallParams => {
+    const { tokenA, tokenB } = params;
 
-  //   if (this.isKAI(tokenA.tokenAddress) || this.isKAI(tokenB.tokenAddress)) {
-  //     const addLiquidityParams = await this.transformAddLiquidityKAIParams(
-  //       params
-  //     );
-  //     return this.router.addLiquidityKAI(addLiquidityParams);
-  //   }
+    if (this.isKAI(tokenA.tokenAddress) || this.isKAI(tokenB.tokenAddress)) {
+      // TODO
+      return {} as SMCParams.CallParams
+    }
+    // TODO
+    return {} as SMCParams.CallParams
+  };
 
-  //   const addLiquidityKAIParams = await this.transformAddLiquidityParams(
-  //     params
-  //   );
-  //   return this.router.addLiquidity(addLiquidityKAIParams);
-  // };
+  removeLiquidityCallParameters = (
+    params: InputParams.RemoveLiquidity
+  ): SMCParams.CallParams => {
+    const { tokenA, tokenB } = params.pair;
+    // // For KAI Pairs
+    if (this.isKAI(tokenA.tokenAddress) || this.isKAI(tokenB.tokenAddress)) {
+    //   const removeLiquidityKAIParams = await this.transformRemoveLiquidityKAIParams(
+    //     params
+    //   );
+    //   return this.router.removeLiquidityKAI(
+    //     removeLiquidityKAIParams,
+    //     this.account
+    //   );
+    }
+    // const removeLiquidityParams = await this.transformRemoveLiquidityParams(
+    //   params
+    // );
+    // return this.router.removeLiquidity(removeLiquidityParams, this.account);
 
-  // removeLiquidity = async (
-  //   params: InputParams.RemoveLiquidity
-  // ): Promise<TxResponse> => {
-  //   const { tokenA, tokenB } = params.pair;
-  //   // For KAI Pairs
-  //   if (this.isKAI(tokenA.tokenAddress) || this.isKAI(tokenB.tokenAddress)) {
-  //     const removeLiquidityKAIParams = await this.transformRemoveLiquidityKAIParams(
-  //       params
-  //     );
-  //     return this.router.removeLiquidityKAI(
-  //       removeLiquidityKAIParams,
-  //       this.account
-  //     );
-  //   }
-  //   const removeLiquidityParams = await this.transformRemoveLiquidityParams(
-  //     params
-  //   );
-  //   return this.router.removeLiquidity(removeLiquidityParams, this.account);
-  // };
+    // TODO
+    return {} as SMCParams.CallParams
+  };
 
   calculateOutputAmount = async ({
     amount,
-    tokenIn,
-    tokenOut,
+    inputToken,
+    outputToken,
     inputType,
   }: InputParams.CalculateOutputAmount): Promise<string> => {
-    if (!amount || !tokenIn || !tokenOut) throw new Error('Params input error.')
-    const { tokenAddress: tokenInAddr, decimals: tokenInDec } = tokenIn
-    const { tokenAddress: tokenOutAddr, decimals: tokenOutDec } = tokenOut
-    const amountDec = Utils.cellValue(amount, tokenInDec)
-    const path = Utils.renderPair(tokenInAddr, tokenOutAddr)
+    if (!amount || !inputToken || !outputToken) throw new Error('Params input error.')
+    const { tokenAddress: inputTokenAddr, decimals: inputTokenDec } = inputToken
+    const { tokenAddress: outputTokenAddr, decimals: outputTokenDec } = outputToken
+    const amountDec = Utils.cellValue(amount, inputTokenDec)
+    const path = Utils.renderPair(inputTokenAddr, outputTokenAddr)
     let amountOutDec = '';
     let decimals;
 
     switch (inputType) {
       case InputType.EXACT_IN:
           amountOutDec = await this.router.getAmountsOut(amountDec, path)
-          decimals = tokenOutDec
+          decimals = outputTokenDec
           break;
       case InputType.EXACT_OUT:
           amountOutDec = await this.router.getAmountsIn(amountDec, path)
-          decimals = tokenInDec
+          decimals = inputTokenDec
           break;
     }
     return Utils.convertValueFollowDecimal(amountOutDec, decimals)
   };
 
   calculatePriceImpact = async ({
-    tokenIn,
-    tokenOut,
+    inputToken,
+    outputToken,
     amountIn,
     amountOut,
   }: InputParams.CalculatePriceImpact): Promise<string> => {
-    if (!tokenIn || !tokenOut || !amountIn || !amountOut) throw new Error("Params input error.")
-    const { decimals: tokenInDec, tokenAddress: tokenInAddr } = tokenIn
-    const { decimals: tokenOutDec,  tokenAddress: tokenOutAddr } = tokenOut
+    if (!inputToken || !outputToken || !amountIn || !amountOut) throw new Error("Params input error.")
+    const { decimals: inputTokenDec, tokenAddress: inputTokenAddr } = inputToken
+    const { decimals: outputTokenDec,  tokenAddress: outputTokenAddr } = outputToken
 
-    const { reserveA, reserveB } = await this.router.getReserves(tokenInAddr, tokenOutAddr);
+    const { reserveA, reserveB } = await this.router.getReserves(inputTokenAddr, outputTokenAddr);
     if (!reserveA || reserveA === '0' || !reserveB || reserveB === '0') return '0';
 
-    const amountInDec = Utils.cellValue(amountIn, tokenInDec)
-    const amountOutDec = Utils.cellValue(amountOut, tokenInDec)
+    const amountInDec = Utils.cellValue(amountIn, inputTokenDec)
+    const amountOutDec = Utils.cellValue(amountOut, inputTokenDec)
 
     const midPrice = reserveA ? new Fraction(reserveB).divide(reserveA) : new Fraction(0);
-    const amountInFrac = new Fraction(amountInDec, JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(tokenInDec)))
-    const amountOutFrac = new Fraction(amountOutDec, JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(tokenOutDec)))
+    const amountInFrac = new Fraction(amountInDec, JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(inputTokenDec)))
+    const amountOutFrac = new Fraction(amountOutDec, JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(outputTokenDec)))
 
     const exactQuote = midPrice.multiply(amountInFrac)
     const slippage = exactQuote.subtract(amountOutFrac).divide(exactQuote)
@@ -150,21 +149,21 @@ export class KaidexClient extends KaidexService {
   marketSwapCallParameters = ({
     amountIn,
     amountOut,
-    tokenIn,
-    tokenOut,
+    inputToken,
+    outputToken,
     addressTo,
     inputType,
     txDeadline,
     slippageTolerance
   }: InputParams.MarketSwap): SMCParams.CallParams => {
-    if (!amountIn || !amountOut || !addressTo || !tokenIn || !tokenOut) throw new Error("Params input error.")
-    const kaiIn = this.isKAI(tokenIn.tokenAddress)
-    const kaiOut = this.isKAI(tokenOut.tokenAddress)
-    const amountInDec = Utils.cellValue(amountIn, tokenIn.decimals)
-    const amountOutDec = Utils.cellValue(amountOut, tokenOut.decimals)
+    if (!amountIn || !amountOut || !addressTo || !inputToken || !outputToken) throw new Error("Params input error.")
+    const kaiIn = this.isKAI(inputToken.tokenAddress)
+    const kaiOut = this.isKAI(outputToken.tokenAddress)
+    const amountInDec = Utils.cellValue(amountIn, inputToken.decimals)
+    const amountOutDec = Utils.cellValue(amountOut, outputToken.decimals)
     const amountOutMinDec = Utils.calculateSlippageValue(amountOutDec, slippageTolerance, 'sub')
     const amountInMaxDec = Utils.calculateSlippageValue(amountInDec, slippageTolerance, 'add')
-    const path = Utils.renderPair(tokenIn.tokenAddress, tokenOut.tokenAddress)
+    const path = Utils.renderPair(inputToken.tokenAddress, outputToken.tokenAddress)
 
     let swapParams: SMCParams.CallParams = {} as SMCParams.CallParams
     switch (inputType) {
@@ -213,29 +212,29 @@ export class KaidexClient extends KaidexService {
   limitOrderCallParameters = ({
     amountIn,
     amountOut,
-    tokenIn,
-    tokenOut,
+    inputToken,
+    outputToken,
     inputType,
     tradeType
   }: InputParams.LimitOrder): SMCParams.CallParams => {
 
-    if (!amountIn || !amountOut || !tokenIn || !tokenOut) throw new Error("Params input error.")
-    const { tokenAddress: tokenInAddr, decimals: tokenInDec } = tokenIn;
-    const { tokenAddress: tokenOutAddr,  decimals: tokenOutDec } = tokenOut;
-    const amountInDec = Utils.cellValue(amountIn, tokenInDec)
-    const amountOutDec = Utils.cellValue(amountOut, tokenOutDec)
-    const kaiIn = this.isKAI(tokenIn.tokenAddress)
+    if (!amountIn || !amountOut || !inputToken || !outputToken) throw new Error("Params input error.")
+    const { tokenAddress: inputTokenAddr, decimals: inputTokenDec } = inputToken;
+    const { tokenAddress: outputTokenAddr,  decimals: outputTokenDec } = outputToken;
+    const amountInDec = Utils.cellValue(amountIn, inputTokenDec)
+    const amountOutDec = Utils.cellValue(amountOut, outputTokenDec)
+    const kaiIn = this.isKAI(inputToken.tokenAddress)
     let swapParams: SMCParams.CallParams = {} as SMCParams.CallParams
     if (kaiIn) {
       swapParams = {
         methodName: methodNames.ORDER_INPUT_KAI,
-        args: [tokenOutAddr, amountOutDec, inputType, tradeType],
+        args: [outputTokenAddr, amountOutDec, inputType, tradeType],
         amount: amountInDec,
       }
     } else {
       swapParams = {
         methodName: methodNames.ORDER_INPUT_TOKENS,
-        args: [tokenInAddr, amountInDec, tokenOutAddr, amountOutDec, inputType, tradeType]
+        args: [inputTokenAddr, amountInDec, outputTokenAddr, amountOutDec, inputType, tradeType]
       }
     }
     return swapParams

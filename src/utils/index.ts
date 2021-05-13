@@ -1,6 +1,5 @@
 import JSBI from 'jsbi';
 import { Fraction } from '../entities/fraction';
-import { KardiaAccount } from 'kardia-js-sdk';
 
 // const ZERO = JSBI.BigInt(0)
 export const ONE = JSBI.BigInt(1);
@@ -109,10 +108,10 @@ const calculateLiquidityProvidersFee = (amountIn: string | number): string => {
     .toFixed();
 };
 
-const validateAccount = (account: KAIAccount): boolean => {
-  const { privateKey, publicKey } = account;
-  return !!KardiaAccount.isAddress(publicKey) && !!privateKey.trim();
-};
+// const validateAccount = (account: KAIAccount): boolean => {
+//   const { privateKey, publicKey } = account;
+//   return !!KardiaAccount.isAddress(publicKey) && !!privateKey.trim();
+// };
 
 const renderPair = (tokenIn: string, tokenOut: string): string[] => {
   if (!tokenIn || !tokenOut) throw new Error('Error render pair: token not found!')
@@ -124,6 +123,5 @@ export const Utils = {
   convertValueFollowDecimal,
   calculateSlippageValue,
   calculateLiquidityProvidersFee,
-  validateAccount,
   renderPair
 };

@@ -1,8 +1,7 @@
 import JSBI from 'jsbi';
-import { methodNames, DEFAULT_APPROVE_AMOUNT } from '../constants';
+import { methodNames } from '../constants';
 import { AbstractSmcService } from '../entities';
 import { KardiaAccount } from 'kardia-js-sdk';
-import { Utils } from '../utils';
 
 export class KRC20Service extends AbstractSmcService {
   getAllowance = async (
@@ -49,28 +48,28 @@ export class KRC20Service extends AbstractSmcService {
     });
   }
 
-  approveToken = async ({
-    token,
-    amount,
-    account,
-  }: {
-    token: Token;
-    amount?: string | number;
-    account?: KAIAccount;
-  }): Promise<TxResponse> => {
-    if (!KardiaAccount.isAddress(token.tokenAddress))
-      throw new Error('Invalid token Address');
+  // approveToken = async ({
+  //   token,
+  //   amount,
+  //   account,
+  // }: {
+  //   token: Token;
+  //   amount?: string | number;
+  //   account?: KAIAccount;
+  // }): Promise<TxResponse> => {
+  //   if (!KardiaAccount.isAddress(token.tokenAddress))
+  //     throw new Error('Invalid token Address');
 
-    const amountToApprove = amount
-      ? Utils.cellValue(amount, token.decimals)
-      : DEFAULT_APPROVE_AMOUNT;
-    const args = {
-      abi: this.abi,
-      contractAddr: token.tokenAddress,
-      methodName: methodNames.APPROVE,
-      params: [this.smcAddress, amountToApprove],
-    };
+  //   const amountToApprove = amount
+  //     ? Utils.cellValue(amount, token.decimals)
+  //     : DEFAULT_APPROVE_AMOUNT;
+  //   const args = {
+  //     abi: this.abi,
+  //     contractAddr: token.tokenAddress,
+  //     methodName: methodNames.APPROVE,
+  //     params: [this.smcAddress, amountToApprove],
+  //   };
 
-    return this.processSmcParams(args, account);
-  };
+  //   return this.processSmcParams(args, account);
+  // };
 }

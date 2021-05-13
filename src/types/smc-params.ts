@@ -1,4 +1,4 @@
-declare namespace SMCParams {
+export declare namespace SMCParams {
   interface CallParams {
     methodName: string;
     args: (string | string[] | number)[];
@@ -19,7 +19,6 @@ declare namespace SMCParams {
     contractAddr: string;
     methodName: string;
     params: any;
-    account: KAIAccount;
     amount?: string;
     gasLimit?: number;
     gasPrice?: number;

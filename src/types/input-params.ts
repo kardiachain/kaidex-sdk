@@ -1,3 +1,5 @@
+import { MyLiquidityPair, Token } from "./index";
+
 export enum TradeType {
   BUY = 0,
   SELL = 1,
@@ -16,14 +18,14 @@ export enum InputType {
 export declare namespace InputParams {
   interface CalculateOutputAmount {
     amount: number | string;
-    tokenIn: Token;
-    tokenOut: Token;
+    inputToken: Token;
+    outputToken: Token;
     inputType: InputType
   }
 
   interface CalculatePriceImpact {
-    tokenIn: Token;
-    tokenOut: Token;
+    inputToken: Token;
+    outputToken: Token;
     amountIn: string;
     amountOut: string;
   }
@@ -49,8 +51,8 @@ export declare namespace InputParams {
   interface MarketSwap {
     amountIn: string;
     amountOut: string;
-    tokenIn: Token;
-    tokenOut: Token;
+    inputToken: Token;
+    outputToken: Token;
     addressTo: string;
     inputType: InputType;
     txDeadline: string | number;
@@ -60,8 +62,8 @@ export declare namespace InputParams {
   interface LimitOrder {
     amountIn: string;
     amountOut: string;
-    tokenIn: Token;
-    tokenOut: Token;
+    inputToken: Token;
+    outputToken: Token;
     tradeType: TradeType;
     inputType: InputType;
   }
