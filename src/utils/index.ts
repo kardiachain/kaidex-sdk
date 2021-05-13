@@ -74,12 +74,12 @@ const removeTrailingZeros = (value: any): string => {
 };
 
 const calculateSlippageValue = (
-  value: Fraction | string | number,
+  value: string,
   slippageTolerance: string | number,
   type: 'add' | 'sub'
 ): string => {
   try {
-    const _value = value instanceof Fraction ? value : new Fraction(Utils.cellValue(value));
+    const _value = new Fraction(value);
     const slippageFrac = new Fraction(
       cellValue(slippageTolerance),
       cellValue(100)
@@ -117,6 +117,10 @@ const validateAccount = (account: KAIAccount): boolean => {
 const renderPair = (tokenIn: string, tokenOut: string): string[] => {
   if (!tokenIn || !tokenOut) throw new Error('Error render pair: token not found!')
   return [tokenIn, tokenOut]
+}
+
+const validateToken = (token: Token): boolean => {
+
 }
 
 export const Utils = {
