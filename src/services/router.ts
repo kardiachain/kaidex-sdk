@@ -34,14 +34,12 @@ export class RouterService extends AbstractSmcService {
     if (!KardiaAccount.isAddress(tokenA) || !KardiaAccount.isAddress(tokenB))
       throw new Error('Invalid token!');
 
-    const result = await this.smcCallData({
+    return this.smcCallData({
       abi: this.abi,
       contractAddr: this.smcAddress,
       methodName: methodNames.GET_RESERVES,
       params: [tokenA, tokenB],
     });
-
-    return { reserveA: result['reserveA'], reserveB: result['reserveB'] };
   };
 
   getAmountsOut = async (amountIn: string, path: string[]): Promise<string> => {

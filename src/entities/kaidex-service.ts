@@ -33,7 +33,6 @@ export abstract class KaidexService {
       router: (abis && abis.router) || abiJson.ROUTER,
       factory: (abis && abis.factory) || abiJson.FACTORY,
       krc20: (abis && abis.krc20) || abiJson.KRC20,
-      pair: (abis && abis.pair) || abiJson.PAIR,
       limitOrder: (abis && abis.limitOrder) || abiJson.LIMIT_ORDER,
     };
 
