@@ -108,20 +108,16 @@ const calculateLiquidityProvidersFee = (amountIn: string | number): string => {
     .toFixed();
 };
 
-// const validateAccount = (account: KAIAccount): boolean => {
-//   const { privateKey, publicKey } = account;
-//   return !!KardiaAccount.isAddress(publicKey) && !!privateKey.trim();
-// };
-
 const renderPair = (tokenIn: string, tokenOut: string): string[] => {
-  if (!tokenIn || !tokenOut) throw new Error('Error render pair: token not found!')
-  return [tokenIn, tokenOut]
-}
+  if (!tokenIn || !tokenOut)
+    throw new Error('Error render pair: token not found!');
+  return [tokenIn, tokenOut];
+};
 
 export const Utils = {
   cellValue,
   convertValueFollowDecimal,
   calculateSlippageValue,
   calculateLiquidityProvidersFee,
-  renderPair
+  renderPair,
 };

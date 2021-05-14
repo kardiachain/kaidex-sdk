@@ -2,15 +2,14 @@ import KardiaClient from 'kardia-js-sdk';
 import {
   abiJson,
   endpoint as defaultEndpoint,
-  smcAddresses as defaultAddresses
+  smcAddresses as defaultAddresses,
 } from '../constants';
-import {
-  FactoryService,
-  RouterService,
-  KRC20Service,
-  LimitOrderService,
-} from '../services';
-import { ABIS, KaidexOptions, SmcAddresses } from '../types';
+import { FactoryService, RouterService, KRC20Service } from '../services';
+import { ABIS, KaidexOptions, SmcAddresses, SMCParams } from '../types';
+import { KardiaAccount } from 'kardia-js-sdk';
+import { InputParams } from '../types/input-params';
+import { Utils } from '../utils';
+import { Fraction } from './fraction';
 
 export abstract class KaidexService {
   protected abiJSON: Required<ABIS>;
@@ -20,7 +19,6 @@ export abstract class KaidexService {
   public factory: FactoryService;
   public router: RouterService;
   public krc20: KRC20Service;
-  public limitOrder: LimitOrderService;
 
   protected constructor(
     options: KaidexOptions = {
@@ -70,12 +68,14 @@ export abstract class KaidexService {
       client: this.kardiaClient,
       smcAddress: '',
     });
+  }
 
-    this.limitOrder = new LimitOrderService({
-      abi: this.abiJSON.limitOrder,
-      smcAddress: this.smcAddresses.limitOrder,
-      client: this.kardiaClient,
-    });
+  public get abis() {
+    return this.abiJSON;
+  }
+
+  public get addresses() {
+    return this.smcAddresses;
   }
 
   public isKAI = (tokenAddress: string) =>
@@ -85,197 +85,205 @@ export abstract class KaidexService {
       tokenAddress.toLowerCase() === this.smcAddresses.wkai.toLowerCase()
     );
 
-  // public prepareTokenFormat = (token: Token): Token => {
-  //   return this.isKAI(token.tokenAddress)
-  //     ? {
-  //         ...token,
-  //         tokenAddress: this.smcAddresses.wkai,
-  //         name: KAI_TOKEN_NAME,
-  //         symbol: KAI_TOKEN_SYMBOL,
-  //         logo: token.logo,
-  //         wKAI: true,
-  //         decimals: 18,
-  //       }
-  //     : token;
-  // };
+  protected transformAddLiquidityParams = (
+    params: InputParams.AddLiquidity
+  ): SMCParams.AddLiquidity => {
+    const {
+      slippageTolerance,
+      txDeadline,
+      inputAmount,
+      outputAmount,
+      tokenA,
+      tokenB,
+      walletAddress,
+    } = params;
 
-  // protected transformAddLiquidityParams = (params: InputParams.AddLiquidity): SMCParams.CallParams => {
-  //   const {
-  //     slippageTolerance,
-  //     txDeadline,
-  //     inputAmount,
-  //     outputAmount,
-  //     tokenA,
-  //     tokenB,
-  //     walletAddress
-  //   } = params;
+    if (!KardiaAccount.isAddress(walletAddress))
+      throw new Error('Invalid wallet address');
+    if (
+      !KardiaAccount.isAddress(tokenA.tokenAddress) ||
+      !KardiaAccount.isAddress(tokenB.tokenAddress)
+    )
+      throw new Error('Invalid token address');
 
-  //   if (!KardiaAccount.isAddress(walletAddress)) throw new Error('Invalid wallet address');
-  //   if (!KardiaAccount.isAddress(tokenA.tokenAddress) || !KardiaAccount.isAddress(tokenB.tokenAddress)) throw new Error('Invalid token address');
-    
-  //   const amountADesiredInDec = inputAmount ? Utils.cellValue(inputAmount, tokenA.decimals) : '0';
-  //   const amountBDesiredInDec = outputAmount ? Utils.cellValue(outputAmount, tokenB.decimals) : '0';
-  //   const calculatedAmountAMinInDec = inputAmount
-  //     ? Utils.calculateSlippageValue(
-  //       amountADesiredInDec,
-  //       slippageTolerance,
-  //       'sub'
-  //     ) : '0';
-  //   const calculatedAmountBMinInDec = outputAmount
-  //     ? Utils.calculateSlippageValue(
-  //       amountBDesiredInDec,
-  //       slippageTolerance,
-  //       'sub'
-  //     ) : '0';
-    
-  //   if (!amountADesiredInDec || !calculatedAmountAMinInDec || !amountBDesiredInDec || !calculatedAmountBMinInDec) throw new Error('Invalid token amount');
-  //   if (!txDeadline) throw new Error('Invalid deadline');
-  //   return {
-  //     methodName: methodNames.ADD_LIQUIDITY,
-  //     args: [
-  //       tokenA.tokenAddress,
-  //       tokenB.tokenAddress,
-  //       amountADesiredInDec,
-  //       amountBDesiredInDec,
-  //       calculatedAmountAMinInDec,
-  //       calculatedAmountBMinInDec,
-  //       walletAddress,
-  //       txDeadline,
-  //     ]
-  //   } as SMCParams.CallParams
-  // };
+    const amountADesiredInDec = inputAmount
+      ? Utils.cellValue(inputAmount, tokenA.decimals)
+      : '0';
+    const amountBDesiredInDec = outputAmount
+      ? Utils.cellValue(outputAmount, tokenB.decimals)
+      : '0';
+    const calculatedAmountAMinInDec = inputAmount
+      ? Utils.calculateSlippageValue(
+          amountADesiredInDec,
+          slippageTolerance,
+          'sub'
+        )
+      : '0';
+    const calculatedAmountBMinInDec = outputAmount
+      ? Utils.calculateSlippageValue(
+          amountBDesiredInDec,
+          slippageTolerance,
+          'sub'
+        )
+      : '0';
 
-  // protected transformAddLiquidityKAIParams = (params: InputParams.AddLiquidity): SMCParams.CallParams => {
-  //   const {
-  //     amountADesired,
-  //     amountBDesired,
-  //     amountAMin,
-  //     amountBMin,
-  //     tokenA,
-  //     tokenB,
-  //     walletAddress,
-  //     deadlineInMilliseconds,
-  //   } = this.transformAddLiquidityParams(params);
+    if (
+      !amountADesiredInDec ||
+      !calculatedAmountAMinInDec ||
+      !amountBDesiredInDec ||
+      !calculatedAmountBMinInDec
+    )
+      throw new Error('Invalid token amount');
+    if (!txDeadline) throw new Error('Invalid deadline');
 
-  //   const otherTokenAddress = this.isKAI(tokenA) ? tokenB : tokenA;
-  //   const otherTokenDesiredAmount = this.isKAI(tokenA)
-  //     ? amountBDesired
-  //     : amountADesired;
-  //   const otherTokenMinAmount = this.isKAI(tokenA) ? amountBMin : amountAMin;
-  //   const amountKAI = this.isKAI(tokenA) ? amountADesired : amountBDesired;
-  //   const amountKAIMin = this.isKAI(tokenA) ? amountAMin : amountBMin;
-  //   if (!KardiaAccount.isAddress(walletAddress)) throw new Error('Invalid wallet address');
-  //   if (!KardiaAccount.isAddress(tokenA) || !KardiaAccount.isAddress(tokenB)) throw new Error('Invalid token address');
-  //   if (!amountADesired || !amountAMin || !amountBDesired || !amountBMin) throw new Error('Invalid token amount');
-  //   if (!deadlineInMilliseconds) throw new Error('Invalid deadline');
+    return {
+      tokenA: tokenA.tokenAddress,
+      tokenB: tokenB.tokenAddress,
+      amountADesired: amountADesiredInDec,
+      amountBDesired: amountBDesiredInDec,
+      amountAMin: calculatedAmountAMinInDec,
+      amountBMin: calculatedAmountBMinInDec,
+      walletAddress,
+      deadlineInMilliseconds: txDeadline,
+    };
+  };
 
-  //   return {
-  //     methodName: methodNames.ADD_LIQUIDITY,
-  //     args: [
-  //       otherTokenAddress,
-  //       otherTokenDesiredAmount,
-  //       otherTokenMinAmount,
-  //       amountKAIMin,
-  //       walletAddress,
-  //       deadlineInMilliseconds,
-  //     ],
-  //     amount: amountKAI
-  //   } as SMCParams.CallParams
-  // };
+  protected transformAddLiquidityKAIParams = (
+    params: InputParams.AddLiquidity
+  ): SMCParams.AddLiquidityKAI => {
+    const {
+      amountADesired,
+      amountBDesired,
+      amountAMin,
+      amountBMin,
+      tokenA,
+      tokenB,
+      walletAddress,
+      deadlineInMilliseconds,
+    } = this.transformAddLiquidityParams(params);
 
-  // protected transformRemoveLiquidityParams = async (
-  //   params: InputParams.RemoveLiquidity
-  // ) => {
-  //   const {
-  //     pair,
-  //     withdrawPercent,
-  //     walletAddress,
-  //     slippageTolerance,
-  //     txDeadline,
-  //   } = params;
-  //   const { tokenA, tokenB, balance, pairAddress } = pair;
+    const otherTokenAddress = this.isKAI(tokenA) ? tokenB : tokenA;
+    const otherTokenDesiredAmount = this.isKAI(tokenA)
+      ? amountBDesired
+      : amountADesired;
+    const otherTokenMinAmount = this.isKAI(tokenA) ? amountBMin : amountAMin;
+    const amountKAI = this.isKAI(tokenA) ? amountADesired : amountBDesired;
+    const amountKAIMin = this.isKAI(tokenA) ? amountAMin : amountBMin;
 
-  //   if (!Number(withdrawPercent)) throw new Error('Invalid amount!');
-  //   if (!walletAddress) throw new Error('Invalid wallet!');
-  //   if (!Number(balance)) throw new Error('Not enough balance!');
+    if (!KardiaAccount.isAddress(walletAddress))
+      throw new Error('Invalid wallet address');
+    if (!KardiaAccount.isAddress(tokenA) || !KardiaAccount.isAddress(tokenB))
+      throw new Error('Invalid token address');
+    if (!amountADesired || !amountAMin || !amountBDesired || !amountBMin)
+      throw new Error('Invalid token amount');
+    if (!deadlineInMilliseconds) throw new Error('Invalid deadline');
 
-  //   const totalSupply = await this.krc20.getTotalSupply(pairAddress);
+    return {
+      tokenAddress: otherTokenAddress,
+      amountTokenMin: otherTokenMinAmount,
+      amountTokenDesired: otherTokenDesiredAmount,
+      amountKAI: amountKAI,
+      amountKAIMin: amountKAIMin,
+      walletAddress,
+      deadlineInMilliseconds,
+    };
+  };
 
-  //   //liquidity = balance * withdrawPercent / 100
-  //   const liquidity = new Fraction(balance)
-  //     .multiply(withdrawPercent)
-  //     .divide(100)
-  //     .toFixed();
-  //   const tokenABalance = await this.krc20.balanceOf(
-  //     tokenA.tokenAddress,
-  //     pairAddress
-  //   );
+  protected transformRemoveLiquidityParams = async (
+    params: InputParams.RemoveLiquidity
+  ): Promise<SMCParams.RemoveLiquidity> => {
+    const {
+      pair,
+      withdrawPercent,
+      walletAddress,
+      slippageTolerance,
+      txDeadline,
+    } = params;
+    const { tokenA, tokenB, balance, pairAddress } = pair;
 
-  //   //amountAMin = (balance / totalSupply) * tokenABalance * withdrawPercent / 100
-  //   const amountAMin = new Fraction(balance)
-  //     .divide(totalSupply)
-  //     .multiply(tokenABalance)
-  //     .multiply(withdrawPercent)
-  //     .divide(100);
+    if (!Number(withdrawPercent)) throw new Error('Invalid amount!');
+    if (!walletAddress) throw new Error('Invalid wallet!');
+    if (!Number(balance)) throw new Error('Not enough balance!');
 
-  //   const _amountAMin = Utils.calculateSlippageValue(
-  //     amountAMin,
-  //     slippageTolerance,
-  //     'sub'
-  //   );
-  //   const tokenBBalance = await this.krc20.balanceOf(
-  //     tokenB.tokenAddress,
-  //     pairAddress
-  //   );
+    const totalSupply = await this.krc20.getTotalSupply(pairAddress);
 
-  //   //amountBMin = (balance / totalSupply) * tokenBBalance * withdrawPercent / 100
-  //   const amountBMin = new Fraction(balance)
-  //     .divide(totalSupply)
-  //     .multiply(tokenBBalance)
-  //     .multiply(withdrawPercent)
-  //     .divide(100);
+    //liquidity = balance * withdrawPercent / 100
+    const liquidity = new Fraction(balance)
+      .multiply(withdrawPercent)
+      .divide(100)
+      .toFixed();
+    const tokenABalance = await this.krc20.balanceOf(
+      tokenA.tokenAddress,
+      pairAddress
+    );
 
-  //   const _amountBMin = Utils.calculateSlippageValue(
-  //     amountBMin,
-  //     slippageTolerance,
-  //     'sub'
-  //   );
+    //amountAMin = (balance / totalSupply) * tokenABalance * withdrawPercent / 100
+    const amountAMin = new Fraction(balance)
+      .divide(totalSupply)
+      .multiply(tokenABalance)
+      .multiply(withdrawPercent)
+      .divide(100)
+      .toFixed();
 
-  //   return {
-  //     tokenA: tokenA.tokenAddress,
-  //     tokenB: tokenB.tokenAddress,
-  //     liquidity: liquidity,
-  //     amountAMin: _amountAMin,
-  //     amountBMin: _amountBMin,
-  //     walletAddress,
-  //     deadlineInMilliseconds: txDeadline,
-  //   };
-  // };
+    const _amountAMin = Utils.calculateSlippageValue(
+      amountAMin,
+      slippageTolerance,
+      'sub'
+    );
+    const tokenBBalance = await this.krc20.balanceOf(
+      tokenB.tokenAddress,
+      pairAddress
+    );
 
-  // protected transformRemoveLiquidityKAIParams = async (
-  //   params: InputParams.RemoveLiquidity
-  // ) => {
-  //   const {
-  //     tokenA,
-  //     tokenB,
-  //     liquidity,
-  //     amountAMin,
-  //     amountBMin,
-  //     walletAddress,
-  //     deadlineInMilliseconds,
-  //   } = await this.transformRemoveLiquidityParams(params);
+    //amountBMin = (balance / totalSupply) * tokenBBalance * withdrawPercent / 100
+    const amountBMin = new Fraction(balance)
+      .divide(totalSupply)
+      .multiply(tokenBBalance)
+      .multiply(withdrawPercent)
+      .divide(100)
+      .toFixed();
 
-  //   const otherToken = this.isKAI(tokenA) ? tokenB : tokenA;
-  //   const amountKAIMin = this.isKAI(tokenA) ? amountAMin : amountBMin;
-  //   const amountTokenMin = this.isKAI(tokenA) ? amountBMin : amountAMin;
+    const _amountBMin = Utils.calculateSlippageValue(
+      amountBMin,
+      slippageTolerance,
+      'sub'
+    );
 
-  //   return {
-  //     tokenAddress: otherToken,
-  //     liquidity: liquidity,
-  //     amountKAIMin: amountKAIMin,
-  //     amountTokenMin: amountTokenMin,
-  //     walletAddress,
-  //     deadlineInMilliseconds,
-  //   };
-  // };
+    return {
+      tokenA: tokenA.tokenAddress,
+      tokenB: tokenB.tokenAddress,
+      liquidity: liquidity,
+      amountAMin: _amountAMin,
+      amountBMin: _amountBMin,
+      walletAddress,
+      deadlineInMilliseconds: txDeadline,
+    };
+  };
+
+  protected transformRemoveLiquidityKAIParams = async (
+    params: InputParams.RemoveLiquidity
+  ): Promise<SMCParams.RemoveLiquidityKAI> => {
+    const {
+      tokenA,
+      tokenB,
+      liquidity,
+      amountAMin,
+      amountBMin,
+      walletAddress,
+      deadlineInMilliseconds,
+    } = await this.transformRemoveLiquidityParams(params);
+
+    const otherToken = this.isKAI(tokenA) ? tokenB : tokenA;
+    const amountKAIMin = this.isKAI(tokenA) ? amountAMin : amountBMin;
+    const amountTokenMin = this.isKAI(tokenA) ? amountBMin : amountAMin;
+
+    return {
+      tokenAddress: otherToken,
+      liquidity: liquidity,
+      amountKAIMin: amountKAIMin,
+      amountTokenMin: amountTokenMin,
+      walletAddress,
+      deadlineInMilliseconds,
+    };
+  };
 }

@@ -1,18 +1,13 @@
-import { MyLiquidityPair, Token } from "./index";
+import { MyLiquidityPair, Token } from './index';
 
 export enum TradeType {
   BUY = 0,
   SELL = 1,
 }
 
-export enum TradeInputType {
-  AMOUNT = 'AMOUNT',
-  TOTAL = 'TOTAL',
-}
-
 export enum InputType {
   EXACT_IN = 0,
-  EXACT_OUT = 1
+  EXACT_OUT = 1,
 }
 
 export declare namespace InputParams {
@@ -20,7 +15,7 @@ export declare namespace InputParams {
     amount: number | string;
     inputToken: Token;
     outputToken: Token;
-    inputType: InputType
+    inputType: InputType;
   }
 
   interface CalculatePriceImpact {
@@ -37,7 +32,7 @@ export declare namespace InputParams {
     tokenB: Token;
     walletAddress: string;
     slippageTolerance: string | number;
-    txDeadline: string | number;
+    txDeadline: number;
   }
 
   interface RemoveLiquidity {
@@ -45,7 +40,7 @@ export declare namespace InputParams {
     withdrawPercent: string | number;
     walletAddress: string;
     slippageTolerance: string | number;
-    txDeadline: string | number;
+    txDeadline: number;
   }
 
   interface MarketSwap {
@@ -55,7 +50,7 @@ export declare namespace InputParams {
     outputToken: Token;
     addressTo: string;
     inputType: InputType;
-    txDeadline: string | number;
+    txDeadline: number;
     slippageTolerance: string | number;
   }
 
