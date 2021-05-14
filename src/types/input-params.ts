@@ -62,4 +62,9 @@ export declare namespace InputParams {
     tradeType: TradeType;
     inputType: InputType;
   }
+
+  interface CancelOrder {
+    pairAddr: string;
+    orderID: number;
+  }
 }
