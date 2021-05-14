@@ -4,15 +4,14 @@ import { methodNames, MINIMUM_TOKEN_AMOUNT } from '../constants';
 import { Utils } from '../utils';
 import { InputParams, InputType } from '../types/input-params';
 import { Fraction } from './fraction';
-import { KaidexOptions, SMCParams, Token } from '../types';
+import { SMCParams, Token } from '../types';
 
 export class KaidexClient extends KaidexService {
-  constructor({ abis, smcAddresses, rpcEndpoint }: KaidexOptions = {}) {
-    super({ abis, smcAddresses, rpcEndpoint });
-  }
-
   getPair = (tokenA: string, tokenB: string): Promise<string> =>
     this.factory.getPair(tokenA, tokenB);
+
+  getReverses = (tokenA: string, tokenB: string) =>
+    this.router.getReserves(tokenA, tokenB);
 
   getApprovalState = async (
     tokenAddr: string,
