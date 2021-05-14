@@ -1,29 +1,11 @@
+import { Token } from "./token";
+
 export declare namespace SMCParams {
   interface CallParams {
     methodName: string;
     args: (string | string[] | number)[];
     amount?: number | string;
   }
-  interface InvokeParams {
-    amount?: string;
-    gasLimit?: number;
-    gasPrice?: number;
-    abi: any;
-    contractAddr: string;
-    methodName: string;
-    params: (number | string | string[])[];
-  }
-
-  interface SendActionParams {
-    abi: any;
-    contractAddr: string;
-    methodName: string;
-    params: any;
-    amount?: string;
-    gasLimit?: number;
-    gasPrice?: number;
-  }
-
   interface AddLiquidity {
     amountADesired: string;
     amountBDesired: string;
@@ -78,26 +60,16 @@ export declare namespace SMCParams {
   interface InputSwapParams extends SwapParams {
     maximumInputAmountInDecimal: string;
   }
-
-  interface LimitOrderKAI {
-    outputTokenAddr: string;
-    outputAmount: string;
-    orderType: 0 | 1;
-    kaiAmountIn: string;
-    tradeType: 0 | 1;
-  }
-
-  interface LimitOrder {
-    inputTokenAddr: string;
-    inputAmount: string;
-    outputTokenAddr: string;
-    outputAmount: string;
-    orderType: 0 | 1;
-    tradeType: 0 | 1;
-  }
-
-  interface CancelOrder {
-    pairAddress: string;
-    orderID: number;
-  }
 }
+
+export interface MyLiquidityPair {
+  balance: string;
+  name: string;
+  pairAddress: string;
+  tokenA: Token;
+  tokenB: Token;
+  provider: string;
+  amountA: string;
+  amountB: string;
+}
+

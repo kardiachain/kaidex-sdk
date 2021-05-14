@@ -1,12 +1,13 @@
 import { KaidexService } from './kaidex-service';
 import JSBI from 'jsbi';
-import { methodNames, MINIMUM_TOKEN_AMOUNT } from '../constants';
+import { methodNames } from '../constants';
 import { Utils } from '../utils';
-import { InputParams, InputType } from '../types/input-params';
 import { Fraction } from './fraction';
-import { SMCParams, Token } from '../types';
+import { SMCParams, Token, InputParams, InputType } from '../types';
 
 export class KaidexClient extends KaidexService {
+
+
   getPair = (tokenA: string, tokenB: string): Promise<string> =>
     this.factory.getPair(tokenA, tokenB);
 
@@ -17,9 +18,8 @@ export class KaidexClient extends KaidexService {
     tokenAddr: string,
     walletAddress: string,
     spenderAddress: string,
-    amountToCheck: string | number
+    amountToCheck: number
   ): Promise<boolean> => {
-    const amount = Number(amountToCheck) || MINIMUM_TOKEN_AMOUNT;
     const currentAllowance = await this.krc20.getAllowance(
       tokenAddr,
       walletAddress,
@@ -27,7 +27,7 @@ export class KaidexClient extends KaidexService {
     );
     return JSBI.lessThan(
       currentAllowance,
-      JSBI.BigInt(Utils.cellValue(amount))
+      JSBI.BigInt(Utils.cellValue(amountToCheck))
     );
   };
 

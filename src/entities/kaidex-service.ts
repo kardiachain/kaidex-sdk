@@ -5,9 +5,8 @@ import {
   smcAddresses as defaultAddresses,
 } from '../constants';
 import { FactoryService, RouterService, KRC20Service } from '../services';
-import { ABIS, KaidexOptions, SmcAddresses, SMCParams } from '../types';
+import { ABIS, KaidexOptions, SmcAddresses, SMCParams, InputParams } from '../types';
 import { KardiaAccount } from 'kardia-js-sdk';
-import { InputParams } from '../types/input-params';
 import { Utils } from '../utils';
 import { Fraction } from './fraction';
 
