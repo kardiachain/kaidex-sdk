@@ -115,13 +115,4 @@ export abstract class AbstractSmcService {
   //     gasPrice: gasPrice,
   //   });
   // };
-
-  // processSmcParams = (args: any, account?: KAIAccount): Promise<TxResponse> => {
-  //   if (!account) return this.invokeSMC(args);
-  //   else {
-  //     const isValid = Utils.validateAccount(account);
-  //     if (!isValid) throw new Error('Invalid account');
-  //     return this.smcSendAction({ ...args, account });
-  //   }
-  // };
 }

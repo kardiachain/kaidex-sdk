@@ -1,4 +1,4 @@
-import { PooledTokens, Token } from "./index";
+import { PooledTokens, Token } from './index';
 
 export interface Pair {
   favorite?: boolean;
