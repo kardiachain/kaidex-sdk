@@ -5,8 +5,6 @@ import KardiaClient, {
   KRC20,
 } from 'kardia-js-sdk';
 
-// import { DEFAULT_GAS_LIMIT, DEFAULT_GAS_PRICE } from '../constants';
-
 import KardiaContract from 'kardia-js-sdk/dist/smc';
 // import { Utils } from '../utils';
 import { SMCParams } from '../types';

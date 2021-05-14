@@ -20,7 +20,7 @@ export abstract class KaidexService {
   public router: RouterService;
   public krc20: KRC20Service;
 
-  protected constructor(
+  constructor(
     options: KaidexOptions = {
       abis: {},
       smcAddresses: {},
