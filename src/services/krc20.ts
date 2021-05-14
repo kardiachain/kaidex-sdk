@@ -6,7 +6,8 @@ import { KardiaAccount } from 'kardia-js-sdk';
 export class KRC20Service extends AbstractSmcService {
   getAllowance = async (
     tokenAddress: string,
-    walletAddress: string
+    walletAddress: string,
+    spenderAddress: string
   ): Promise<JSBI> => {
     if (!KardiaAccount.isAddress(tokenAddress))
       throw new Error('Invalid token Address');
@@ -17,7 +18,7 @@ export class KRC20Service extends AbstractSmcService {
       abi: this.abi,
       contractAddr: tokenAddress,
       methodName: methodNames.ALLOWANCE,
-      params: [walletAddress, this.smcAddress],
+      params: [walletAddress, spenderAddress],
     });
     return JSBI.BigInt(amount);
   };

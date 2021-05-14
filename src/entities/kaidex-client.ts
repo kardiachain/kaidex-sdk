@@ -16,12 +16,14 @@ export class KaidexClient extends KaidexService {
   getApprovalState = async (
     tokenAddr: string,
     walletAddress: string,
+    spenderAddress: string,
     amountToCheck: string | number
   ): Promise<boolean> => {
     const amount = Number(amountToCheck) || MINIMUM_TOKEN_AMOUNT;
     const currentAllowance = await this.krc20.getAllowance(
       tokenAddr,
-      walletAddress
+      walletAddress,
+      spenderAddress
     );
     return JSBI.lessThan(
       currentAllowance,
