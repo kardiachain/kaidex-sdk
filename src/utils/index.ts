@@ -1,19 +1,7 @@
 import JSBI from 'jsbi';
 import { Fraction } from '../entities/fraction';
-
-// const ZERO = JSBI.BigInt(0)
 export const ONE = JSBI.BigInt(1);
-// const THREE = JSBI.BigInt(3)
 export const TEN = JSBI.BigInt(10);
-// const TWENTY_FIVE = JSBI.BigInt(25)
-// const FIFTY = JSBI.BigInt(50)
-// const SEVENTY_FIVE = JSBI.BigInt(75)
-// const ONE_HUNDRED = JSBI.BigInt(100)
-// const ONE_THOUSAND = JSBI.BigInt(1000)
-// const ONE_MILLION = JSBI.BigInt(1000000)
-// const ONE_BILLION = JSBI.BigInt(1000000000)
-
-// const ZERO_FRACTION = new Fraction(0)
 const ONE_FRACTION = new Fraction(1);
 
 const cellValue = (kaiValue: any, decimals: number = 18): string => {

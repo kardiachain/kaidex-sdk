@@ -16,16 +16,6 @@ const validatePath = (path: string[]): void => {
     throw new Error('Invalid token address!');
 };
 
-// const validateSwapParams = (params: SMCParams.SwapParams): void => {
-//   const { exactAmount, path, addressTo, deadlineInMilliseconds } = params;
-
-//   validatePath(path);
-//   if (!KardiaAccount.isAddress(addressTo))
-//     throw new Error('Invalid wallet address!');
-//   if (!exactAmount) throw new Error('Invalid exact amount!');
-//   if (!deadlineInMilliseconds) throw new Error('Invalid deadline');
-// };
-
 export class RouterService extends AbstractSmcService {
   getReserves = async (
     tokenA: string,
