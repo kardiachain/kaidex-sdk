@@ -5,11 +5,6 @@ export enum TradeType {
   SELL = 1,
 }
 
-export enum TradeInputType {
-  AMOUNT = 'AMOUNT',
-  TOTAL = 'TOTAL',
-}
-
 export enum InputType {
   EXACT_IN = 0,
   EXACT_OUT = 1
@@ -66,5 +61,10 @@ export declare namespace InputParams {
     outputToken: Token;
     tradeType: TradeType;
     inputType: InputType;
+  }
+
+  interface CancelOrder {
+    pairAddr: string;
+    orderID: number;
   }
 }

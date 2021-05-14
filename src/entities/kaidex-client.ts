@@ -123,7 +123,7 @@ export class KaidexClient extends KaidexService {
     return slippage.multiply(100).toFixed(5)
   };
 
-  public calculateExchangeRate = async (
+  calculateExchangeRate = async (
     tokenA: Token,
     tokenB: Token
   ): Promise<{ rateAB: number; rateBA: number }> => {
@@ -240,14 +240,11 @@ export class KaidexClient extends KaidexService {
     return swapParams
   };
 
-  cancelLimitOrder = (
-    pairAddress: string,
-    orderID: number
-  ): SMCParams.CallParams => {
-    if (!pairAddress || !orderID) throw new Error('Params input error.')
+  cancelLimitOrder = ({pairAddr, orderID}: InputParams.CancelOrder): SMCParams.CallParams => {
+    if (!pairAddr || !orderID) throw new Error('Params input error.')
     return {
       methodName: methodNames.CANCEL_ORDER,
-      args: [pairAddress, orderID]
+      args: [pairAddr, orderID]
     } as SMCParams.CallParams
   };
 }
