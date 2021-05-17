@@ -1,20 +1,7 @@
 import JSBI from 'jsbi';
 import { Fraction } from '../entities/fraction';
-import { KardiaAccount } from 'kardia-js-sdk';
-
-// const ZERO = JSBI.BigInt(0)
 export const ONE = JSBI.BigInt(1);
-// const THREE = JSBI.BigInt(3)
 export const TEN = JSBI.BigInt(10);
-// const TWENTY_FIVE = JSBI.BigInt(25)
-// const FIFTY = JSBI.BigInt(50)
-// const SEVENTY_FIVE = JSBI.BigInt(75)
-// const ONE_HUNDRED = JSBI.BigInt(100)
-// const ONE_THOUSAND = JSBI.BigInt(1000)
-// const ONE_MILLION = JSBI.BigInt(1000000)
-// const ONE_BILLION = JSBI.BigInt(1000000000)
-
-// const ZERO_FRACTION = new Fraction(0)
 const ONE_FRACTION = new Fraction(1);
 
 const cellValue = (kaiValue: any, decimals: number = 18): string => {
@@ -73,13 +60,13 @@ const removeTrailingZeros = (value: any): string => {
   return after ? after : '0';
 };
 
-const calculateSlippageValue = async (
-  value: Fraction | string | number,
+const calculateSlippageValue = (
+  value: string,
   slippageTolerance: string | number,
   type: 'add' | 'sub'
-): Promise<string> => {
+): string => {
   try {
-    const _value = value instanceof Fraction ? value : new Fraction(Utils.cellValue(value));
+    const _value = new Fraction(value);
     const slippageFrac = new Fraction(
       cellValue(slippageTolerance),
       cellValue(100)
@@ -109,9 +96,10 @@ const calculateLiquidityProvidersFee = (amountIn: string | number): string => {
     .toFixed();
 };
 
-const validateAccount = (account: KAIAccount): boolean => {
-  const { privateKey, publicKey } = account;
-  return !!KardiaAccount.isAddress(publicKey) && !!privateKey.trim();
+const renderPair = (tokenIn: string, tokenOut: string): string[] => {
+  if (!tokenIn || !tokenOut)
+    throw new Error('Error render pair: token not found!');
+  return [tokenIn, tokenOut];
 };
 
 export const Utils = {
@@ -119,5 +107,5 @@ export const Utils = {
   convertValueFollowDecimal,
   calculateSlippageValue,
   calculateLiquidityProvidersFee,
-  validateAccount,
+  renderPair,
 };

@@ -3,17 +3,10 @@ import {
   abiJson,
   endpoint as defaultEndpoint,
   smcAddresses as defaultAddresses,
-  KAI_TOKEN_NAME,
-  KAI_TOKEN_SYMBOL,
 } from '../constants';
-import {
-  FactoryService,
-  RouterService,
-  KRC20Service,
-  LimitOrderService,
-} from '../services';
-import { TradeType, TradeInputType } from '../types/input-params';
-import { InputParams } from '../types/input-params';
+import { FactoryService, RouterService, KRC20Service } from '../services';
+import { ABIS, KaidexOptions, SmcAddresses, SMCParams, InputParams } from '../types';
+import { KardiaAccount } from 'kardia-js-sdk';
 import { Utils } from '../utils';
 import { Fraction } from './fraction';
 
@@ -25,9 +18,8 @@ export abstract class KaidexService {
   public factory: FactoryService;
   public router: RouterService;
   public krc20: KRC20Service;
-  public limitOrder: LimitOrderService;
 
-  protected constructor(
+  constructor(
     options: KaidexOptions = {
       abis: {},
       smcAddresses: {},
@@ -40,7 +32,6 @@ export abstract class KaidexService {
       router: (abis && abis.router) || abiJson.ROUTER,
       factory: (abis && abis.factory) || abiJson.FACTORY,
       krc20: (abis && abis.krc20) || abiJson.KRC20,
-      pair: (abis && abis.pair) || abiJson.PAIR,
       limitOrder: (abis && abis.limitOrder) || abiJson.LIMIT_ORDER,
     };
 
@@ -75,12 +66,14 @@ export abstract class KaidexService {
       client: this.kardiaClient,
       smcAddress: '',
     });
+  }
 
-    this.limitOrder = new LimitOrderService({
-      abi: this.abiJSON.limitOrder,
-      smcAddress: this.smcAddresses.limitOrder,
-      client: this.kardiaClient,
-    });
+  public get abis() {
+    return this.abiJSON;
+  }
+
+  public get addresses() {
+    return this.smcAddresses;
   }
 
   public isKAI = (tokenAddress: string) =>
@@ -90,32 +83,9 @@ export abstract class KaidexService {
       tokenAddress.toLowerCase() === this.smcAddresses.wkai.toLowerCase()
     );
 
-  public prepareTokenFormat = (token: Token): Token => {
-    return this.isKAI(token.tokenAddress)
-      ? {
-          ...token,
-          tokenAddress: this.smcAddresses.wkai,
-          name: KAI_TOKEN_NAME,
-          symbol: KAI_TOKEN_SYMBOL,
-          logo: token.logo,
-          wKAI: true,
-          decimals: 18,
-        }
-      : token;
-  };
-
-  public calculateTransactionDeadline = async (
-    txDeadline: string | number
-  ): Promise<number> => {
-    const latestBlock = await this.kardiaClient.kaiChain.getBlockHeaderByHash(
-      'latest'
-    );
-    return new Date(latestBlock.time).getTime() + Number(txDeadline) * 60;
-  };
-
-  protected transformAddLiquidityParams = async (
+  protected transformAddLiquidityParams = (
     params: InputParams.AddLiquidity
-  ) => {
+  ): SMCParams.AddLiquidity => {
     const {
       slippageTolerance,
       txDeadline,
@@ -126,6 +96,14 @@ export abstract class KaidexService {
       walletAddress,
     } = params;
 
+    if (!KardiaAccount.isAddress(walletAddress))
+      throw new Error('Invalid wallet address');
+    if (
+      !KardiaAccount.isAddress(tokenA.tokenAddress) ||
+      !KardiaAccount.isAddress(tokenB.tokenAddress)
+    )
+      throw new Error('Invalid token address');
+
     const amountADesiredInDec = inputAmount
       ? Utils.cellValue(inputAmount, tokenA.decimals)
       : '0';
@@ -133,36 +111,44 @@ export abstract class KaidexService {
       ? Utils.cellValue(outputAmount, tokenB.decimals)
       : '0';
     const calculatedAmountAMinInDec = inputAmount
-      ? await Utils.calculateSlippageValue(
+      ? Utils.calculateSlippageValue(
           amountADesiredInDec,
           slippageTolerance,
           'sub'
         )
       : '0';
     const calculatedAmountBMinInDec = outputAmount
-      ? await Utils.calculateSlippageValue(
+      ? Utils.calculateSlippageValue(
           amountBDesiredInDec,
           slippageTolerance,
           'sub'
         )
       : '0';
-    const deadline = await this.calculateTransactionDeadline(txDeadline);
+
+    if (
+      !amountADesiredInDec ||
+      !calculatedAmountAMinInDec ||
+      !amountBDesiredInDec ||
+      !calculatedAmountBMinInDec
+    )
+      throw new Error('Invalid token amount');
+    if (!txDeadline) throw new Error('Invalid deadline');
 
     return {
+      tokenA: tokenA.tokenAddress,
+      tokenB: tokenB.tokenAddress,
       amountADesired: amountADesiredInDec,
       amountBDesired: amountBDesiredInDec,
       amountAMin: calculatedAmountAMinInDec,
       amountBMin: calculatedAmountBMinInDec,
-      tokenA: tokenA.tokenAddress,
-      tokenB: tokenB.tokenAddress,
       walletAddress,
-      deadlineInMilliseconds: deadline,
+      deadlineInMilliseconds: txDeadline,
     };
   };
 
-  protected transformAddLiquidityKAIParams = async (
+  protected transformAddLiquidityKAIParams = (
     params: InputParams.AddLiquidity
-  ) => {
+  ): SMCParams.AddLiquidityKAI => {
     const {
       amountADesired,
       amountBDesired,
@@ -172,7 +158,7 @@ export abstract class KaidexService {
       tokenB,
       walletAddress,
       deadlineInMilliseconds,
-    } = await this.transformAddLiquidityParams(params);
+    } = this.transformAddLiquidityParams(params);
 
     const otherTokenAddress = this.isKAI(tokenA) ? tokenB : tokenA;
     const otherTokenDesiredAmount = this.isKAI(tokenA)
@@ -182,12 +168,20 @@ export abstract class KaidexService {
     const amountKAI = this.isKAI(tokenA) ? amountADesired : amountBDesired;
     const amountKAIMin = this.isKAI(tokenA) ? amountAMin : amountBMin;
 
+    if (!KardiaAccount.isAddress(walletAddress))
+      throw new Error('Invalid wallet address');
+    if (!KardiaAccount.isAddress(tokenA) || !KardiaAccount.isAddress(tokenB))
+      throw new Error('Invalid token address');
+    if (!amountADesired || !amountAMin || !amountBDesired || !amountBMin)
+      throw new Error('Invalid token amount');
+    if (!deadlineInMilliseconds) throw new Error('Invalid deadline');
+
     return {
       tokenAddress: otherTokenAddress,
       amountTokenMin: otherTokenMinAmount,
       amountTokenDesired: otherTokenDesiredAmount,
-      amountKAI,
-      amountKAIMin,
+      amountKAI: amountKAI,
+      amountKAIMin: amountKAIMin,
       walletAddress,
       deadlineInMilliseconds,
     };
@@ -195,7 +189,7 @@ export abstract class KaidexService {
 
   protected transformRemoveLiquidityParams = async (
     params: InputParams.RemoveLiquidity
-  ) => {
+  ): Promise<SMCParams.RemoveLiquidity> => {
     const {
       pair,
       withdrawPercent,
@@ -226,9 +220,10 @@ export abstract class KaidexService {
       .divide(totalSupply)
       .multiply(tokenABalance)
       .multiply(withdrawPercent)
-      .divide(100);
+      .divide(100)
+      .toFixed();
 
-    const _amountAMin = await Utils.calculateSlippageValue(
+    const _amountAMin = Utils.calculateSlippageValue(
       amountAMin,
       slippageTolerance,
       'sub'
@@ -243,14 +238,14 @@ export abstract class KaidexService {
       .divide(totalSupply)
       .multiply(tokenBBalance)
       .multiply(withdrawPercent)
-      .divide(100);
+      .divide(100)
+      .toFixed();
 
-    const _amountBMin = await Utils.calculateSlippageValue(
+    const _amountBMin = Utils.calculateSlippageValue(
       amountBMin,
       slippageTolerance,
       'sub'
     );
-    const deadline = await this.calculateTransactionDeadline(txDeadline);
 
     return {
       tokenA: tokenA.tokenAddress,
@@ -259,13 +254,13 @@ export abstract class KaidexService {
       amountAMin: _amountAMin,
       amountBMin: _amountBMin,
       walletAddress,
-      deadlineInMilliseconds: deadline,
+      deadlineInMilliseconds: txDeadline,
     };
   };
 
   protected transformRemoveLiquidityKAIParams = async (
     params: InputParams.RemoveLiquidity
-  ) => {
+  ): Promise<SMCParams.RemoveLiquidityKAI> => {
     const {
       tokenA,
       tokenB,
@@ -288,40 +283,5 @@ export abstract class KaidexService {
       walletAddress,
       deadlineInMilliseconds,
     };
-  };
-
-  protected findSwapType = (
-    tokenA: string,
-    tokenB: string,
-    tradeType: TradeType,
-    tradeInputType: TradeInputType
-  ) => {
-    const swap = 'swap';
-    const kai = 'KAI';
-    const _for = 'For';
-    const tokens = 'Tokens';
-    const exact = 'Exact';
-
-    let tokenNameA: string;
-    let tokenNameB: string;
-
-    const isKAIPair = this.isKAI(tokenA) || this.isKAI(tokenB);
-    const exactFirst =
-      (tradeType === TradeType.SELL &&
-        tradeInputType === TradeInputType.AMOUNT) ||
-      (tradeType === TradeType.BUY && tradeInputType === TradeInputType.TOTAL);
-
-    if (isKAIPair) {
-      const kaiFirst =
-        (tradeType === TradeType.BUY && this.isKAI(tokenB)) ||
-        (tradeType === TradeType.SELL && this.isKAI(tokenA));
-      tokenNameA = `${exactFirst ? exact : ''}${kaiFirst ? kai : tokens}`;
-      tokenNameB = `${exactFirst ? '' : exact}${kaiFirst ? tokens : kai}`;
-    } else {
-      tokenNameA = `${exactFirst ? exact : ''}${tokens}`;
-      tokenNameB = `${exactFirst ? '' : exact}${tokens}`;
-    }
-
-    return swap + tokenNameA + _for + tokenNameB;
   };
 }

@@ -5,10 +5,7 @@ import KardiaClient, {
   KRC20,
 } from 'kardia-js-sdk';
 
-import { DEFAULT_GAS_LIMIT, DEFAULT_GAS_PRICE } from '../constants';
-
 import KardiaContract from 'kardia-js-sdk/dist/smc';
-import { Utils } from '../utils';
 
 export abstract class AbstractSmcService {
   readonly abi: any;
@@ -53,74 +50,5 @@ export abstract class AbstractSmcService {
     this.kardiaContract.updateAbi(abi);
     const invoke = await this.kardiaContract.invokeContract(methodName, params);
     return await invoke.call(contractAddr, {}, 'latest');
-  };
-
-  invokeSMC = async ({
-    abi,
-    contractAddr,
-    methodName,
-    params,
-    amount = '0',
-    gasLimit = 3000000,
-    gasPrice = 1,
-  }: SMCParams.InvokeParams): Promise<any> => {
-    const abiJson =
-      typeof abi === 'string'
-        ? JSON.parse(abi)
-        : JSON.parse(JSON.stringify(abi));
-    this.kardiaContract.updateAbi(abiJson);
-    const data = await this.kardiaContract
-      .invokeContract(methodName, params)
-      .txData();
-    return this.kardiaTransaction.sendTransactionToExtension(
-      {
-        gas: gasLimit,
-        gasPrice: gasPrice,
-        value: amount,
-        to: contractAddr,
-        data: data,
-      },
-      true
-    );
-  };
-
-  smcSendAction = async ({
-    abi,
-    contractAddr,
-    methodName,
-    params,
-    account,
-    amount = '0',
-    gasLimit = DEFAULT_GAS_LIMIT,
-    gasPrice = DEFAULT_GAS_PRICE,
-  }: SMCParams.SendActionParams) => {
-    if (!account.publicKey || !account.privateKey) {
-      throw new Error('Invalid account');
-    }
-
-    console.log('Transaction params:');
-    console.log('Contract address:', contractAddr);
-    console.log('Method name:', methodName);
-    console.log('Params:', params);
-    console.log('Amount:', amount);
-
-    this.kardiaContract.updateAbi(abi);
-    const invoke = await this.kardiaContract.invokeContract(methodName, params);
-
-    return invoke.send(account.privateKey, contractAddr, {
-      from: account.publicKey,
-      amount: amount,
-      gas: gasLimit,
-      gasPrice: gasPrice,
-    });
-  };
-
-  processSmcParams = (args: any, account?: KAIAccount): Promise<TxResponse> => {
-    if (!account) return this.invokeSMC(args);
-    else {
-      const isValid = Utils.validateAccount(account);
-      if (!isValid) throw new Error('Invalid account');
-      return this.smcSendAction({ ...args, account });
-    }
   };
 }

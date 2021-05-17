@@ -1,27 +1,28 @@
+import { MyLiquidityPair, Token } from './index';
+
 export enum TradeType {
-  BUY = 'BUY',
-  SELL = 'SELL',
+  BUY = 0,
+  SELL = 1,
 }
 
-export enum TradeInputType {
-  AMOUNT = 'AMOUNT',
-  TOTAL = 'TOTAL',
+export enum InputType {
+  EXACT_IN = 0,
+  EXACT_OUT = 1,
 }
 
 export declare namespace InputParams {
   interface CalculateOutputAmount {
-    amountIn: number | string;
-    tradeInputType: TradeInputType;
-    tokenA: Token;
-    tokenB: Token;
+    amount: number | string;
+    inputToken: Token;
+    outputToken: Token;
+    inputType: InputType;
   }
 
   interface CalculatePriceImpact {
-    tokenA: Token;
-    tokenB: Token;
-    inputAmount: string;
-    estimateOutput: string;
-    tradeInputType: TradeInputType;
+    inputToken: Token;
+    outputToken: Token;
+    amountIn: string;
+    amountOut: string;
   }
 
   interface AddLiquidity {
@@ -31,7 +32,7 @@ export declare namespace InputParams {
     tokenB: Token;
     walletAddress: string;
     slippageTolerance: string | number;
-    txDeadline: string | number;
+    txDeadline: number;
   }
 
   interface RemoveLiquidity {
@@ -39,25 +40,31 @@ export declare namespace InputParams {
     withdrawPercent: string | number;
     walletAddress: string;
     slippageTolerance: string | number;
-    txDeadline: string | number;
+    txDeadline: number;
   }
 
   interface MarketSwap {
-    inputAmount: string | number;
-    outputAmount: string | number;
+    amountIn: string;
+    amountOut: string;
+    inputToken: Token;
+    outputToken: Token;
     addressTo: string;
-    pair: Pair;
-    tradeInputType: TradeInputType;
-    tradeType: TradeType;
+    inputType: InputType;
+    txDeadline: number;
     slippageTolerance: string | number;
-    txDeadline: string | number;
   }
 
   interface LimitOrder {
-    amount: string | number;
-    total: string | number;
-    tokenA: Token;
-    tokenB: Token;
+    amountIn: string;
+    amountOut: string;
+    inputToken: Token;
+    outputToken: Token;
     tradeType: TradeType;
+    inputType: InputType;
+  }
+
+  interface CancelOrder {
+    pairAddr: string;
+    orderID: number;
   }
 }
