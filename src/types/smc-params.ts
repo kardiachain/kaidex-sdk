@@ -1,4 +1,4 @@
-import { Token } from "./token";
+import {PooledTokens, Token} from "./token";
 
 export declare namespace SMCParams {
   interface CallParams {
@@ -69,7 +69,6 @@ export interface MyLiquidityPair {
   tokenA: Token;
   tokenB: Token;
   provider: string;
-  amountA: string;
-  amountB: string;
+  pooledToken: PooledTokens
 }
 
