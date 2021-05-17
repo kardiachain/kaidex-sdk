@@ -69,6 +69,6 @@ export interface MyLiquidityPair {
   tokenA: Token;
   tokenB: Token;
   provider: string;
-  pooledToken: PooledTokens
+  pooledTokens: PooledTokens
 }
 
