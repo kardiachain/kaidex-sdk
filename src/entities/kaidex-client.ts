@@ -25,7 +25,7 @@ export class KaidexClient extends KaidexService {
       walletAddress,
       spenderAddress
     );
-    return JSBI.lessThan(
+    return JSBI.greaterThan(
       currentAllowance,
       JSBI.BigInt(Utils.cellValue(amountToCheck))
     );
