@@ -20,12 +20,14 @@ export class KaidexClient extends KaidexService {
     spenderAddress: string,
     amountToCheck: number
   ): Promise<boolean> => {
+
     const currentAllowance = await this.krc20.getAllowance(
       tokenAddr,
       walletAddress,
       spenderAddress
     );
-    return JSBI.lessThan(
+
+    return !JSBI.lessThan(
       currentAllowance,
       JSBI.BigInt(Utils.cellValue(amountToCheck))
     );
