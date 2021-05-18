@@ -326,7 +326,7 @@ export class KaidexClient extends KaidexService {
         } else {
           swapParams = {
             methodName: methodNames.SWAP_TOKENS_FOR_EXACT_TOKENS,
-            args: [amountOutDec, amountOutMinDec, path, addressTo, txDeadline],
+            args: [amountOutDec, amountInMaxDec, path, addressTo, txDeadline],
           };
         }
         break;
