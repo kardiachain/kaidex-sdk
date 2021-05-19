@@ -21,6 +21,8 @@ export class KaidexClient extends KaidexService {
     amountToCheck: number
   ): Promise<boolean> => {
 
+    if (this.isKAI(tokenAddr)) return true
+
     const currentAllowance = await this.krc20.getAllowance(
       tokenAddr,
       walletAddress,
