@@ -106,26 +106,93 @@ We recommend using [np](https://github.com/sindresorhus/np).
 ```js
 import KaidexClient from 'kaidex-sdk'
 
-// For extension
-const client = new KaidexClient()
+// Setup:
+import KaidexClient from 'kaidex-sdk';
 
-// Non-extension
 const client = new KaidexClient({
-    account: { publicKey: '...', privateKey: '...' }
+    smcAddresses: {
+        router: ROUTER_SMC_ADDRESS,
+        limitOrder: LIMIT_ORDER_SMC_ADDRESS,
+        factory: FACTORY_SMC_ADDRESS,
+        wkai: WKAI_SMC_ADDRESS
+    },
+    rpcEndpoint: ''
 })
 
-client.approveToken(tokenAddress, spenderAddress) 
-client.addLiquidity(args: SMCParams.AddLiquidity)
-client.removeLiquidity(args: SMCParams.RemoveLiquidity) 
-client.addLiquidityKAI(args: SMCParams.AddLiquidityKAI)
-client.removeLiquidityKAI(args: SMCParams.RemoveLiquidityKAI)
-client.swapExactTokensForTokens(args: SMCParams.OutputSwapParams)
-client.swapTokensForExactTokens(args: SMCParams.InputSwapParams)
-client.swapExactKAIForTokens(args: SMCParams.OutputSwapParams)
-client.swapExactTokensForKAI(args: SMCParams.OutputSwapParams)
-client.swapTokensForExactKAI(args: SMCParams.InputSwapParams)
-client.swapKAIForExactTokens(args: SMCParams.InputSwapParams)
-client.orderInputKAI(args: SMCParams.OrderInputKAI)
-client.orderInputTokens(args: SMCParams.OrderInputTokens)
-client.cancelOrder(args: SMCParams.CancelOrder)
+
+// Approve token:
+const txResponse = await kaidexClient.invokeSMC({
+    abi: KRC20_ABI,
+    smcAddr: tokenAddr,
+    methodName: 'approve',
+    params: [ROUTER_SMC_ADDRESS, amount]
+})
+
+
+// Add liquidity:
+const { methodName, args, amount } = kaidexClient.addLiquidityCallParameters({
+    inputAmount: string | number,
+    outputAmount: string | number,
+    tokenA: Token,
+    tokenB: Token,
+    walletAddress: string,
+    slippageTolerance: string | number,
+    txDeadline: number
+})
+
+const txResponse = await kaidexClient.invokeSMC({
+    abi: ROUTER_ABI,
+    smcAddr: ROUTER_SMC_ADDRESS,
+    methodName: methodName,
+    params: args,
+    amount: amount
+})
+
+
+// Remove liquidity
+const { methodName, args, amount } = kaidexClient.removeLiquidityCallParameters({
+    pair: MyLiquidityPair,
+    withdrawPercent: string | number,
+    walletAddress: string,
+    slippageTolerance: string | number,
+    txDeadline: number,
+})
+
+const txResponse = await kaidexClient.invokeSMC({
+    abi: ROUTER_ABI,
+    smcAddr: ROUTER_SMC_ADDRESS,
+    methodName: methodName,
+    amount: amount,
+    params: args
+})
+
+
+// Swap tokens:
+const { methodName, args, amount } = kaidexClient.marketSwapCallParameters({
+    amountIn: string,
+    amountOut: string,
+    inputToken: Token,
+    outputToken: Token,
+    addressTo: string,
+    inputType: InputType,
+    txDeadline: number,
+    slippageTolerance: string | number
+})
+
+const txResponse = await kaidexClient.invokeSMC({
+    abi: ROUTER_ABI,
+    smcAddr: ROUTER_SMC_ADDRESS,
+    methodName,
+    amount,
+    params: args
+})
+
+
+// Utils:
+const tokenBalance = kaidexClient.getTokenBalance(tokenAddress, walletAddress)
+const isApproved = kaidexClient.getApprovalState(tokenAddr, walletAddress, spenderAddress, amountToCheck)
+
+const priceImpact = kaidexClient.calculatePriceImpact(inputToken, outputToken, amountIn, amountOut)
+const { rateAB, rateBA } = kaidexClient.calculateExchangeRate(tokenA, tokenB)
+const outputAmount = kaidexClient.calculateOutputAmount(amount, inputToken, outputToken, inputType)
 ```
