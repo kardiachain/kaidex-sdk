@@ -170,17 +170,20 @@ export class KaidexClient extends KaidexService {
       tokenAddress: outputTokenAddr,
       decimals: outputTokenDec,
     } = outputToken;
-    const amountDec = Utils.cellValue(amount, inputTokenDec);
+
+    let amountDec;
     const path = Utils.renderPair(inputTokenAddr, outputTokenAddr);
     let amountOutDec = '';
     let decimals;
 
     switch (inputType) {
       case InputType.EXACT_IN:
+        amountDec = Utils.cellValue(amount, inputTokenDec);
         amountOutDec = await this.router.getAmountsOut(amountDec, path);
         decimals = outputTokenDec;
         break;
       case InputType.EXACT_OUT:
+        amountDec = Utils.cellValue(amount, outputTokenDec)
         amountOutDec = await this.router.getAmountsIn(amountDec, path);
         decimals = inputTokenDec;
         break;
@@ -213,11 +216,12 @@ export class KaidexClient extends KaidexService {
       return '0';
 
     const amountInDec = Utils.cellValue(amountIn, inputTokenDec);
-    const amountOutDec = Utils.cellValue(amountOut, inputTokenDec);
+    const amountOutDec = Utils.cellValue(amountOut, outputTokenDec);
 
-    const midPrice = reserveA
-      ? new Fraction(reserveB).divide(reserveA)
-      : new Fraction(0);
+    const reserveAConvertBigInt = inputTokenDec ? new Fraction(JSBI.BigInt(reserveA), JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(inputTokenDec))) : new Fraction(JSBI.BigInt(reserveA))
+    const reserveBConvertBigInt = outputTokenDec ? new Fraction(JSBI.BigInt(reserveB), JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(outputTokenDec))) : new Fraction(JSBI.BigInt(reserveB))
+    const midPrice = reserveBConvertBigInt.divide(reserveAConvertBigInt)
+
     const amountInFrac = new Fraction(
       amountInDec,
       JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(inputTokenDec))
@@ -322,7 +326,7 @@ export class KaidexClient extends KaidexService {
         } else {
           swapParams = {
             methodName: methodNames.SWAP_TOKENS_FOR_EXACT_TOKENS,
-            args: [amountOutDec, amountOutMinDec, path, addressTo, txDeadline],
+            args: [amountOutDec, amountInMaxDec, path, addressTo, txDeadline],
           };
         }
         break;
