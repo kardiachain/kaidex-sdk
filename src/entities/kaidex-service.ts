@@ -284,4 +284,17 @@ export abstract class KaidexService {
       deadlineInMilliseconds,
     };
   };
+
+  public invokeSMC = async ({ abi, smcAddr, methodName, params, amount = 0, gasLimit = 5000000, gasPrice = 1 }: SMCParams.InvokeParams) => {
+    const abiJson = typeof abi === 'string' ? JSON.parse(abi) : JSON.parse(JSON.stringify(abi))
+    this.kardiaClient.contract.updateAbi(abiJson)
+    const data = await this.kardiaClient.contract.invokeContract(methodName, params).txData()
+    return this.kardiaClient.transaction.sendTransactionToExtension({
+      gas: gasLimit,
+      gasPrice: gasPrice,
+      value: amount,
+      to: smcAddr,
+      data: data
+    }, true)
+  }
 }

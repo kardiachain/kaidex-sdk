@@ -6,6 +6,17 @@ export declare namespace SMCParams {
     args: (string | string[] | number)[];
     amount?: number | string;
   }
+
+  interface InvokeParams {
+    abi: any
+    smcAddr: string
+    methodName: string,
+    params:(string | string[] | number)[]
+    amount?: number,
+    gasLimit?: number,
+    gasPrice?: number
+  }
+
   interface AddLiquidity {
     amountADesired: string;
     amountBDesired: string;
