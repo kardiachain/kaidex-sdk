@@ -19,7 +19,6 @@
     "size": "size-limit",
     "analyze": "size-limit --why"
   },
-  "peerDependencies": {},
   "husky": {
     "hooks": {
       "pre-commit": "tsdx lint"
@@ -55,6 +54,7 @@
   },
   "dependencies": {
     "big.js": "^6.1.1",
+    "bignumber.js": "^9.0.1",
     "decimal.js-light": "^2.5.1",
     "jsbi": "^3.1.4",
     "kardia-js-sdk": "^0.3.4",
