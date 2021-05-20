@@ -845,11 +845,6 @@ var ROUTER = [
 				internalType: "address",
 				name: "_WKAI",
 				type: "address"
-			},
-			{
-				internalType: "address",
-				name: "_kaiReward",
-				type: "address"
 			}
 		],
 		stateMutability: "nonpayable",
@@ -934,7 +929,7 @@ var ROUTER = [
 				type: "uint256"
 			}
 		],
-		stateMutability: "nonpayable",
+		stateMutability: "payable",
 		type: "function"
 	},
 	{
@@ -1144,44 +1139,6 @@ var ROUTER = [
 		inputs: [
 			{
 				internalType: "uint256",
-				name: "amountOut",
-				type: "uint256"
-			},
-			{
-				internalType: "address[]",
-				name: "path",
-				type: "address[]"
-			}
-		],
-		name: "getTotalKAIAmountsIn",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "amount",
-				type: "uint256"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [
-		],
-		name: "kaiReward",
-		outputs: [
-			{
-				internalType: "address",
-				name: "",
-				type: "address"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [
-			{
-				internalType: "uint256",
 				name: "amountA",
 				type: "uint256"
 			},
@@ -1304,149 +1261,6 @@ var ROUTER = [
 			{
 				internalType: "uint256",
 				name: "amountKAI",
-				type: "uint256"
-			}
-		],
-		stateMutability: "nonpayable",
-		type: "function"
-	},
-	{
-		inputs: [
-			{
-				internalType: "address",
-				name: "token",
-				type: "address"
-			},
-			{
-				internalType: "uint256",
-				name: "liquidity",
-				type: "uint256"
-			},
-			{
-				internalType: "uint256",
-				name: "amountTokenMin",
-				type: "uint256"
-			},
-			{
-				internalType: "uint256",
-				name: "amountKAIMin",
-				type: "uint256"
-			},
-			{
-				internalType: "address",
-				name: "to",
-				type: "address"
-			},
-			{
-				internalType: "uint256",
-				name: "deadline",
-				type: "uint256"
-			},
-			{
-				internalType: "bool",
-				name: "approveMax",
-				type: "bool"
-			},
-			{
-				internalType: "uint8",
-				name: "v",
-				type: "uint8"
-			},
-			{
-				internalType: "bytes32",
-				name: "r",
-				type: "bytes32"
-			},
-			{
-				internalType: "bytes32",
-				name: "s",
-				type: "bytes32"
-			}
-		],
-		name: "removeLiquidityKAIWithPermit",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "amountToken",
-				type: "uint256"
-			},
-			{
-				internalType: "uint256",
-				name: "amountKAI",
-				type: "uint256"
-			}
-		],
-		stateMutability: "nonpayable",
-		type: "function"
-	},
-	{
-		inputs: [
-			{
-				internalType: "address",
-				name: "tokenA",
-				type: "address"
-			},
-			{
-				internalType: "address",
-				name: "tokenB",
-				type: "address"
-			},
-			{
-				internalType: "uint256",
-				name: "liquidity",
-				type: "uint256"
-			},
-			{
-				internalType: "uint256",
-				name: "amountAMin",
-				type: "uint256"
-			},
-			{
-				internalType: "uint256",
-				name: "amountBMin",
-				type: "uint256"
-			},
-			{
-				internalType: "address",
-				name: "to",
-				type: "address"
-			},
-			{
-				internalType: "uint256",
-				name: "deadline",
-				type: "uint256"
-			},
-			{
-				internalType: "bool",
-				name: "approveMax",
-				type: "bool"
-			},
-			{
-				internalType: "uint8",
-				name: "v",
-				type: "uint8"
-			},
-			{
-				internalType: "bytes32",
-				name: "r",
-				type: "bytes32"
-			},
-			{
-				internalType: "bytes32",
-				name: "s",
-				type: "bytes32"
-			}
-		],
-		name: "removeLiquidityWithPermit",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "amountA",
-				type: "uint256"
-			},
-			{
-				internalType: "uint256",
-				name: "amountB",
 				type: "uint256"
 			}
 		],
@@ -1675,6 +1489,30 @@ var ROUTER = [
 			}
 		],
 		stateMutability: "payable",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "uint256[]",
+				name: "amounts",
+				type: "uint256[]"
+			},
+			{
+				internalType: "address[]",
+				name: "path",
+				type: "address[]"
+			},
+			{
+				internalType: "address",
+				name: "to",
+				type: "address"
+			}
+		],
+		name: "swapWithLimitOrder",
+		outputs: [
+		],
+		stateMutability: "nonpayable",
 		type: "function"
 	},
 	{
@@ -1971,22 +1809,6 @@ var FACTORY = [
 		],
 		payable: false,
 		stateMutability: "view",
-		type: "function"
-	},
-	{
-		constant: false,
-		inputs: [
-			{
-				internalType: "address",
-				name: "_pair",
-				type: "address"
-			}
-		],
-		name: "removePair",
-		outputs: [
-		],
-		payable: false,
-		stateMutability: "nonpayable",
 		type: "function"
 	},
 	{

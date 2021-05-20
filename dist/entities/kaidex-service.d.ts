@@ -16,5 +16,5 @@ export declare abstract class KaidexService {
     protected transformAddLiquidityKAIParams: (params: InputParams.AddLiquidity) => SMCParams.AddLiquidityKAI;
     protected transformRemoveLiquidityParams: (params: InputParams.RemoveLiquidity) => Promise<SMCParams.RemoveLiquidity>;
     protected transformRemoveLiquidityKAIParams: (params: InputParams.RemoveLiquidity) => Promise<SMCParams.RemoveLiquidityKAI>;
-    invokeSMC: ({ abi, smcAddr, methodName, params, amount, gasLimit, gasPrice }: SMCParams.InvokeParams) => Promise<any>;
+    invokeSMC: ({ abi, smcAddr, methodName, params, amount, gasLimit, gasPrice, }: SMCParams.InvokeParams) => Promise<any>;
 }

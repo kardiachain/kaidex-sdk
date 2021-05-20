@@ -3,7 +3,7 @@ import { SMCParams, Token, InputParams } from '../types';
 export declare class KaidexClient extends KaidexService {
     getPair: (tokenA: string, tokenB: string) => Promise<string>;
     getReverses: (tokenA: string, tokenB: string) => Promise<import("../types").PooledTokens>;
-    getApprovalState: ({ tokenAddr, decimals, walletAddress, spenderAddress, amountToCheck }: {
+    getApprovalState: ({ tokenAddr, decimals, walletAddress, spenderAddress, amountToCheck, }: {
         tokenAddr: string;
         decimals: number;
         walletAddress: string;
@@ -21,5 +21,5 @@ export declare class KaidexClient extends KaidexService {
     }>;
     marketSwapCallParameters: ({ amountIn, amountOut, inputToken, outputToken, addressTo, inputType, txDeadline, slippageTolerance, }: InputParams.MarketSwap) => SMCParams.CallParams;
     limitOrderCallParameters: ({ amountIn, amountOut, inputToken, outputToken, inputType, tradeType, }: InputParams.LimitOrder) => SMCParams.CallParams;
-    cancelLimitOrder: ({ pairAddr, orderID }: InputParams.CancelOrder) => SMCParams.CallParams;
+    cancelLimitOrder: ({ pairAddr, orderID, }: InputParams.CancelOrder) => SMCParams.CallParams;
 }
