@@ -203,7 +203,9 @@ export abstract class KaidexService {
       slippageTolerance,
       txDeadline,
     } = params;
-    const { tokenA, tokenB, balance, pairAddress } = pair;
+    const { tokenA, tokenB, pairAddress } = pair;
+
+    const balance = await this.krc20.balanceOf(pairAddress, walletAddress)
 
     if (!Number(withdrawPercent)) throw new Error('Invalid amount!');
     if (!walletAddress) throw new Error('Invalid wallet!');
