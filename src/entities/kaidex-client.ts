@@ -14,15 +14,20 @@ export class KaidexClient extends KaidexService {
   getReverses = (tokenA: string, tokenB: string) =>
     this.router.getReserves(tokenA, tokenB);
 
-  getApprovalState = async (
-    tokenAddr: string,
-    walletAddress: string,
-    spenderAddress: string,
-    amountToCheck: number
-  ): Promise<boolean> => {
-
+  getApprovalState = async ({
+    tokenAddr,
+    decimals,
+    walletAddress,
+    spenderAddress,
+    amountToCheck
+  } : {
+    tokenAddr: string;
+    decimals: number;
+    walletAddress: string;
+    spenderAddress: string;
+    amountToCheck: number | string
+  }): Promise<boolean> => {
     if (this.isKAI(tokenAddr)) return true
-
     const currentAllowance = await this.krc20.getAllowance(
       tokenAddr,
       walletAddress,
@@ -31,7 +36,7 @@ export class KaidexClient extends KaidexService {
 
     return !JSBI.lessThan(
       currentAllowance,
-      JSBI.BigInt(Utils.cellValue(amountToCheck))
+      JSBI.BigInt(Utils.cellValue(amountToCheck, decimals))
     );
   };
 

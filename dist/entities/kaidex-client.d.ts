@@ -3,7 +3,13 @@ import { SMCParams, Token, InputParams } from '../types';
 export declare class KaidexClient extends KaidexService {
     getPair: (tokenA: string, tokenB: string) => Promise<string>;
     getReverses: (tokenA: string, tokenB: string) => Promise<import("../types").PooledTokens>;
-    getApprovalState: (tokenAddr: string, walletAddress: string, spenderAddress: string, amountToCheck: number) => Promise<boolean>;
+    getApprovalState: ({ tokenAddr, decimals, walletAddress, spenderAddress, amountToCheck }: {
+        tokenAddr: string;
+        decimals: number;
+        walletAddress: string;
+        spenderAddress: string;
+        amountToCheck: number | string;
+    }) => Promise<boolean>;
     getTokenBalance: (tokenAddress: string, walletAddress: string) => Promise<string>;
     addLiquidityCallParameters: (params: InputParams.AddLiquidity) => SMCParams.CallParams;
     removeLiquidityCallParameters: (params: InputParams.RemoveLiquidity) => Promise<SMCParams.CallParams>;

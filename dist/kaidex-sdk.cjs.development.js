@@ -3930,28 +3930,30 @@ var KaidexClient = /*#__PURE__*/function (_KaidexService) {
     };
 
     _this.getApprovalState = /*#__PURE__*/function () {
-      var _ref = _asyncToGenerator( /*#__PURE__*/runtime_1.mark(function _callee(tokenAddr, walletAddress, spenderAddress, amountToCheck) {
-        var currentAllowance;
+      var _ref2 = _asyncToGenerator( /*#__PURE__*/runtime_1.mark(function _callee(_ref) {
+        var tokenAddr, decimals, walletAddress, spenderAddress, amountToCheck, currentAllowance;
         return runtime_1.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
+                tokenAddr = _ref.tokenAddr, decimals = _ref.decimals, walletAddress = _ref.walletAddress, spenderAddress = _ref.spenderAddress, amountToCheck = _ref.amountToCheck;
+
                 if (!_this.isKAI(tokenAddr)) {
-                  _context.next = 2;
+                  _context.next = 3;
                   break;
                 }
 
                 return _context.abrupt("return", true);
 
-              case 2:
-                _context.next = 4;
+              case 3:
+                _context.next = 5;
                 return _this.krc20.getAllowance(tokenAddr, walletAddress, spenderAddress);
 
-              case 4:
+              case 5:
                 currentAllowance = _context.sent;
-                return _context.abrupt("return", !JSBI.lessThan(currentAllowance, JSBI.BigInt(Utils.cellValue(amountToCheck))));
+                return _context.abrupt("return", !JSBI.lessThan(currentAllowance, JSBI.BigInt(Utils.cellValue(amountToCheck, decimals))));
 
-              case 6:
+              case 7:
               case "end":
                 return _context.stop();
             }
@@ -3959,8 +3961,8 @@ var KaidexClient = /*#__PURE__*/function (_KaidexService) {
         }, _callee);
       }));
 
-      return function (_x, _x2, _x3, _x4) {
-        return _ref.apply(this, arguments);
+      return function (_x) {
+        return _ref2.apply(this, arguments);
       };
     }();
 
@@ -4006,7 +4008,7 @@ var KaidexClient = /*#__PURE__*/function (_KaidexService) {
     };
 
     _this.removeLiquidityCallParameters = /*#__PURE__*/function () {
-      var _ref2 = _asyncToGenerator( /*#__PURE__*/runtime_1.mark(function _callee2(params) {
+      var _ref3 = _asyncToGenerator( /*#__PURE__*/runtime_1.mark(function _callee2(params) {
         var _params$pair, inputToken, outputToken, _yield$_this$transfor, tokenAddress, _liquidity, amountKAIMin, amountTokenMin, _walletAddress2, _deadlineInMilliseconds2, _yield$_this$transfor2, tokenA, tokenB, liquidity, amountAMin, amountBMin, walletAddress, deadlineInMilliseconds;
 
         return runtime_1.wrap(function _callee2$(_context2) {
@@ -4062,19 +4064,19 @@ var KaidexClient = /*#__PURE__*/function (_KaidexService) {
         }, _callee2);
       }));
 
-      return function (_x5) {
-        return _ref2.apply(this, arguments);
+      return function (_x2) {
+        return _ref3.apply(this, arguments);
       };
     }();
 
     _this.calculateOutputAmount = /*#__PURE__*/function () {
-      var _ref4 = _asyncToGenerator( /*#__PURE__*/runtime_1.mark(function _callee3(_ref3) {
+      var _ref5 = _asyncToGenerator( /*#__PURE__*/runtime_1.mark(function _callee3(_ref4) {
         var amount, inputToken, outputToken, inputType, inputTokenAddr, inputTokenDec, outputTokenAddr, outputTokenDec, amountDec, path, amountOutDec, decimals;
         return runtime_1.wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                amount = _ref3.amount, inputToken = _ref3.inputToken, outputToken = _ref3.outputToken, inputType = _ref3.inputType;
+                amount = _ref4.amount, inputToken = _ref4.inputToken, outputToken = _ref4.outputToken, inputType = _ref4.inputType;
 
                 if (!(!amount || !inputToken || !outputToken)) {
                   _context3.next = 3;
@@ -4123,20 +4125,20 @@ var KaidexClient = /*#__PURE__*/function (_KaidexService) {
         }, _callee3);
       }));
 
-      return function (_x6) {
-        return _ref4.apply(this, arguments);
+      return function (_x3) {
+        return _ref5.apply(this, arguments);
       };
     }();
 
     _this.calculatePriceImpact = /*#__PURE__*/function () {
-      var _ref6 = _asyncToGenerator( /*#__PURE__*/runtime_1.mark(function _callee4(_ref5) {
+      var _ref7 = _asyncToGenerator( /*#__PURE__*/runtime_1.mark(function _callee4(_ref6) {
         var inputToken, outputToken, amountIn, amountOut, inputTokenDec, inputTokenAddr, outputTokenDec, outputTokenAddr, _yield$_this$router$g, reserveA, reserveB, amountInDec, amountOutDec, reserveAConvertBigInt, reserveBConvertBigInt, midPrice, amountInFrac, amountOutFrac, exactQuote, slippage;
 
         return runtime_1.wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
-                inputToken = _ref5.inputToken, outputToken = _ref5.outputToken, amountIn = _ref5.amountIn, amountOut = _ref5.amountOut;
+                inputToken = _ref6.inputToken, outputToken = _ref6.outputToken, amountIn = _ref6.amountIn, amountOut = _ref6.amountOut;
 
                 if (!(!inputToken || !outputToken || !amountIn || !amountOut)) {
                   _context4.next = 3;
@@ -4183,13 +4185,13 @@ var KaidexClient = /*#__PURE__*/function (_KaidexService) {
         }, _callee4);
       }));
 
-      return function (_x7) {
-        return _ref6.apply(this, arguments);
+      return function (_x4) {
+        return _ref7.apply(this, arguments);
       };
     }();
 
     _this.calculateExchangeRate = /*#__PURE__*/function () {
-      var _ref7 = _asyncToGenerator( /*#__PURE__*/runtime_1.mark(function _callee5(tokenA, tokenB) {
+      var _ref8 = _asyncToGenerator( /*#__PURE__*/runtime_1.mark(function _callee5(tokenA, tokenB) {
         var _yield$_this$router$g2, reserveA, reserveB, tokenAValue, tokenBValue, _tokenAValue, _tokenBValue, rateAB, rateBA;
 
         return runtime_1.wrap(function _callee5$(_context5) {
@@ -4222,20 +4224,20 @@ var KaidexClient = /*#__PURE__*/function (_KaidexService) {
         }, _callee5);
       }));
 
-      return function (_x8, _x9) {
-        return _ref7.apply(this, arguments);
+      return function (_x5, _x6) {
+        return _ref8.apply(this, arguments);
       };
     }();
 
-    _this.marketSwapCallParameters = function (_ref8) {
-      var amountIn = _ref8.amountIn,
-          amountOut = _ref8.amountOut,
-          inputToken = _ref8.inputToken,
-          outputToken = _ref8.outputToken,
-          addressTo = _ref8.addressTo,
-          inputType = _ref8.inputType,
-          txDeadline = _ref8.txDeadline,
-          slippageTolerance = _ref8.slippageTolerance;
+    _this.marketSwapCallParameters = function (_ref9) {
+      var amountIn = _ref9.amountIn,
+          amountOut = _ref9.amountOut,
+          inputToken = _ref9.inputToken,
+          outputToken = _ref9.outputToken,
+          addressTo = _ref9.addressTo,
+          inputType = _ref9.inputType,
+          txDeadline = _ref9.txDeadline,
+          slippageTolerance = _ref9.slippageTolerance;
       if (!amountIn || !amountOut || !addressTo || !inputToken || !outputToken) throw new Error('Params input error.');
 
       var kaiIn = _this.isKAI(inputToken.tokenAddress);
@@ -4296,13 +4298,13 @@ var KaidexClient = /*#__PURE__*/function (_KaidexService) {
       return swapParams;
     };
 
-    _this.limitOrderCallParameters = function (_ref9) {
-      var amountIn = _ref9.amountIn,
-          amountOut = _ref9.amountOut,
-          inputToken = _ref9.inputToken,
-          outputToken = _ref9.outputToken,
-          inputType = _ref9.inputType,
-          tradeType = _ref9.tradeType;
+    _this.limitOrderCallParameters = function (_ref10) {
+      var amountIn = _ref10.amountIn,
+          amountOut = _ref10.amountOut,
+          inputToken = _ref10.inputToken,
+          outputToken = _ref10.outputToken,
+          inputType = _ref10.inputType,
+          tradeType = _ref10.tradeType;
       if (!amountIn || !amountOut || !inputToken || !outputToken) throw new Error('Params input error.');
       var inputTokenAddr = inputToken.tokenAddress,
           inputTokenDec = inputToken.decimals;
@@ -4331,9 +4333,9 @@ var KaidexClient = /*#__PURE__*/function (_KaidexService) {
       return swapParams;
     };
 
-    _this.cancelLimitOrder = function (_ref10) {
-      var pairAddr = _ref10.pairAddr,
-          orderID = _ref10.orderID;
+    _this.cancelLimitOrder = function (_ref11) {
+      var pairAddr = _ref11.pairAddr,
+          orderID = _ref11.orderID;
       if (!pairAddr || !orderID) throw new Error('Params input error.');
       return {
         methodName: methodNames.CANCEL_ORDER,
