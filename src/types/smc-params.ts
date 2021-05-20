@@ -1,4 +1,4 @@
-import {PooledTokens, Token} from "./token";
+import { PooledTokens, Token } from './token';
 
 export declare namespace SMCParams {
   interface CallParams {
@@ -8,13 +8,13 @@ export declare namespace SMCParams {
   }
 
   interface InvokeParams {
-    abi: any
-    smcAddr: string
-    methodName: string,
-    params:(string | string[] | number)[]
-    amount?: number,
-    gasLimit?: number,
-    gasPrice?: number
+    abi: any;
+    smcAddr: string;
+    methodName: string;
+    params: (string | string[] | number)[];
+    amount?: number;
+    gasLimit?: number;
+    gasPrice?: number;
   }
 
   interface AddLiquidity {
@@ -80,6 +80,5 @@ export interface MyLiquidityPair {
   tokenA: Token;
   tokenB: Token;
   provider: string;
-  pooledTokens: PooledTokens
+  pooledTokens: PooledTokens;
 }
-

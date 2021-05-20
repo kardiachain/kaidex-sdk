@@ -5,7 +5,13 @@ import {
   smcAddresses as defaultAddresses,
 } from '../constants';
 import { FactoryService, RouterService, KRC20Service } from '../services';
-import { ABIS, KaidexOptions, SmcAddresses, SMCParams, InputParams } from '../types';
+import {
+  ABIS,
+  KaidexOptions,
+  SmcAddresses,
+  SMCParams,
+  InputParams,
+} from '../types';
 import { KardiaAccount } from 'kardia-js-sdk';
 import { Utils } from '../utils';
 import { Fraction } from './fraction';
@@ -285,16 +291,32 @@ export abstract class KaidexService {
     };
   };
 
-  public invokeSMC = async ({ abi, smcAddr, methodName, params, amount = 0, gasLimit = 5000000, gasPrice = 1 }: SMCParams.InvokeParams) => {
-    const abiJson = typeof abi === 'string' ? JSON.parse(abi) : JSON.parse(JSON.stringify(abi))
-    this.kardiaClient.contract.updateAbi(abiJson)
-    const data = await this.kardiaClient.contract.invokeContract(methodName, params).txData()
-    return this.kardiaClient.transaction.sendTransactionToExtension({
-      gas: gasLimit,
-      gasPrice: gasPrice,
-      value: amount,
-      to: smcAddr,
-      data: data
-    }, true)
-  }
+  public invokeSMC = async ({
+    abi,
+    smcAddr,
+    methodName,
+    params,
+    amount = 0,
+    gasLimit = 5000000,
+    gasPrice = 1,
+  }: SMCParams.InvokeParams) => {
+    const abiJson =
+      typeof abi === 'string'
+        ? JSON.parse(abi)
+        : JSON.parse(JSON.stringify(abi));
+    this.kardiaClient.contract.updateAbi(abiJson);
+    const data = await this.kardiaClient.contract
+      .invokeContract(methodName, params)
+      .txData();
+    return this.kardiaClient.transaction.sendTransactionToExtension(
+      {
+        gas: gasLimit,
+        gasPrice: gasPrice,
+        value: amount,
+        to: smcAddr,
+        data: data,
+      },
+      true
+    );
+  };
 }

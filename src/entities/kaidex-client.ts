@@ -6,8 +6,6 @@ import { Fraction } from './fraction';
 import { SMCParams, Token, InputParams, InputType } from '../types';
 
 export class KaidexClient extends KaidexService {
-
-
   getPair = (tokenA: string, tokenB: string): Promise<string> =>
     this.factory.getPair(tokenA, tokenB);
 
@@ -19,15 +17,15 @@ export class KaidexClient extends KaidexService {
     decimals,
     walletAddress,
     spenderAddress,
-    amountToCheck
-  } : {
+    amountToCheck,
+  }: {
     tokenAddr: string;
     decimals: number;
     walletAddress: string;
     spenderAddress: string;
-    amountToCheck: number | string
+    amountToCheck: number | string;
   }): Promise<boolean> => {
-    if (this.isKAI(tokenAddr)) return true
+    if (this.isKAI(tokenAddr)) return true;
     const currentAllowance = await this.krc20.getAllowance(
       tokenAddr,
       walletAddress,
@@ -190,7 +188,7 @@ export class KaidexClient extends KaidexService {
         decimals = outputTokenDec;
         break;
       case InputType.EXACT_OUT:
-        amountDec = Utils.cellValue(amount, outputTokenDec)
+        amountDec = Utils.cellValue(amount, outputTokenDec);
         amountOutDec = await this.router.getAmountsIn(amountDec, path);
         decimals = inputTokenDec;
         break;
@@ -225,9 +223,19 @@ export class KaidexClient extends KaidexService {
     const amountInDec = Utils.cellValue(amountIn, inputTokenDec);
     const amountOutDec = Utils.cellValue(amountOut, outputTokenDec);
 
-    const reserveAConvertBigInt = inputTokenDec ? new Fraction(JSBI.BigInt(reserveA), JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(inputTokenDec))) : new Fraction(JSBI.BigInt(reserveA))
-    const reserveBConvertBigInt = outputTokenDec ? new Fraction(JSBI.BigInt(reserveB), JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(outputTokenDec))) : new Fraction(JSBI.BigInt(reserveB))
-    const midPrice = reserveBConvertBigInt.divide(reserveAConvertBigInt)
+    const reserveAConvertBigInt = inputTokenDec
+      ? new Fraction(
+          JSBI.BigInt(reserveA),
+          JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(inputTokenDec))
+        )
+      : new Fraction(JSBI.BigInt(reserveA));
+    const reserveBConvertBigInt = outputTokenDec
+      ? new Fraction(
+          JSBI.BigInt(reserveB),
+          JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(outputTokenDec))
+        )
+      : new Fraction(JSBI.BigInt(reserveB));
+    const midPrice = reserveBConvertBigInt.divide(reserveAConvertBigInt);
 
     const amountInFrac = new Fraction(
       amountInDec,
@@ -385,11 +393,14 @@ export class KaidexClient extends KaidexService {
     return swapParams;
   };
 
-  cancelLimitOrder = ({pairAddr, orderID}: InputParams.CancelOrder): SMCParams.CallParams => {
-    if (!pairAddr || !orderID) throw new Error('Params input error.')
+  cancelLimitOrder = ({
+    pairAddr,
+    orderID,
+  }: InputParams.CancelOrder): SMCParams.CallParams => {
+    if (!pairAddr || !orderID) throw new Error('Params input error.');
     return {
       methodName: methodNames.CANCEL_ORDER,
-      args: [pairAddr, orderID]
-    } as SMCParams.CallParams
+      args: [pairAddr, orderID],
+    } as SMCParams.CallParams;
   };
 }

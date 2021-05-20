@@ -286,21 +286,6 @@
 		"constant": false,
 		"inputs": [
 			{
-				"internalType": "address",
-				"name": "_pair",
-				"type": "address"
-			}
-		],
-		"name": "removePair",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
 				"internalType": "uint8",
 				"name": "_tier",
 				"type": "uint8"
