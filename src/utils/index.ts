@@ -1,13 +1,13 @@
 import JSBI from 'jsbi';
 import { Fraction } from '../entities/fraction';
+import { BigNumber } from 'bignumber.js';
 export const ONE = JSBI.BigInt(1);
 export const TEN = JSBI.BigInt(10);
 const ONE_FRACTION = new Fraction(1);
-import { BigNumber } from "bignumber.js";
 
 const cellValue = (kaiValue: any, decimals: number = 18): string => {
   const rawValue = new BigNumber(kaiValue);
-  return rawValue.multipliedBy(new BigNumber(10 ** decimals)).toFixed(0, 1)
+  return rawValue.multipliedBy(new BigNumber(10 ** decimals)).toFixed(0, 1);
 };
 
 const convertValueFollowDecimal = (

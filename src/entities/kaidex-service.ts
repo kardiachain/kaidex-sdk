@@ -205,15 +205,18 @@ export abstract class KaidexService {
     } = params;
     const { tokenA, tokenB, pairAddress } = pair;
 
-    const balance = await this.krc20.balanceOf(pairAddress, walletAddress)
+    const balance = await this.krc20.balanceOf(pairAddress, walletAddress);
 
     if (!Number(withdrawAmount)) throw new Error('Invalid amount!');
     if (!walletAddress) throw new Error('Invalid wallet!');
-    if (!Number(balance) || Number(withdrawAmount) > Number(balance)) throw new Error('Not enough balance!');
+    if (!Number(balance) || Number(withdrawAmount) > Number(balance))
+      throw new Error('Not enough balance!');
 
     const totalSupply = await this.krc20.getTotalSupply(pairAddress);
 
-    const withdrawPercent = new Fraction(withdrawAmount).divide(balance).multiply(100)
+    const withdrawPercent = new Fraction(withdrawAmount)
+      .divide(balance)
+      .multiply(100);
 
     const tokenABalance = await this.krc20.balanceOf(
       tokenA.tokenAddress,
