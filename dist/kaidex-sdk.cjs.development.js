@@ -3511,13 +3511,13 @@ var KaidexService = /*#__PURE__*/function () {
 
     this.transformRemoveLiquidityParams = /*#__PURE__*/function () {
       var _ref = _asyncToGenerator( /*#__PURE__*/runtime_1.mark(function _callee(params) {
-        var pair, withdrawPercent, walletAddress, slippageTolerance, txDeadline, tokenA, tokenB, pairAddress, balance, totalSupply, liquidity, tokenABalance, amountAMin, _amountAMin, tokenBBalance, amountBMin, _amountBMin;
+        var pair, withdrawAmount, walletAddress, slippageTolerance, txDeadline, tokenA, tokenB, pairAddress, balance, totalSupply, withdrawPercent, tokenABalance, amountAMin, _amountAMin, tokenBBalance, amountBMin, _amountBMin;
 
         return runtime_1.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                pair = params.pair, withdrawPercent = params.withdrawPercent, walletAddress = params.walletAddress, slippageTolerance = params.slippageTolerance, txDeadline = params.txDeadline;
+                pair = params.pair, withdrawAmount = params.withdrawAmount, walletAddress = params.walletAddress, slippageTolerance = params.slippageTolerance, txDeadline = params.txDeadline;
                 tokenA = pair.tokenA, tokenB = pair.tokenB, pairAddress = pair.pairAddress;
                 _context.next = 4;
                 return _this.krc20.balanceOf(pairAddress, walletAddress);
@@ -3525,7 +3525,7 @@ var KaidexService = /*#__PURE__*/function () {
               case 4:
                 balance = _context.sent;
 
-                if (Number(withdrawPercent)) {
+                if (Number(withdrawAmount)) {
                   _context.next = 7;
                   break;
                 }
@@ -3541,7 +3541,7 @@ var KaidexService = /*#__PURE__*/function () {
                 throw new Error('Invalid wallet!');
 
               case 9:
-                if (Number(balance)) {
+                if (!(!Number(balance) || Number(withdrawAmount) < Number(balance))) {
                   _context.next = 11;
                   break;
                 }
@@ -3554,8 +3554,7 @@ var KaidexService = /*#__PURE__*/function () {
 
               case 13:
                 totalSupply = _context.sent;
-                //liquidity = balance * withdrawPercent / 100
-                liquidity = new Fraction(balance).multiply(withdrawPercent).divide(100).toFixed();
+                withdrawPercent = Number(withdrawAmount) / Number(balance) * 100;
                 _context.next = 17;
                 return _this.krc20.balanceOf(tokenA.tokenAddress, pairAddress);
 
@@ -3575,7 +3574,7 @@ var KaidexService = /*#__PURE__*/function () {
                 return _context.abrupt("return", {
                   tokenA: tokenA.tokenAddress,
                   tokenB: tokenB.tokenAddress,
-                  liquidity: liquidity,
+                  liquidity: withdrawAmount,
                   amountAMin: _amountAMin,
                   amountBMin: _amountBMin,
                   walletAddress: walletAddress,

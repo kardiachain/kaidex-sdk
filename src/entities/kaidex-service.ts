@@ -198,7 +198,7 @@ export abstract class KaidexService {
   ): Promise<SMCParams.RemoveLiquidity> => {
     const {
       pair,
-      withdrawPercent,
+      withdrawAmount,
       walletAddress,
       slippageTolerance,
       txDeadline,
@@ -207,17 +207,14 @@ export abstract class KaidexService {
 
     const balance = await this.krc20.balanceOf(pairAddress, walletAddress)
 
-    if (!Number(withdrawPercent)) throw new Error('Invalid amount!');
+    if (!Number(withdrawAmount)) throw new Error('Invalid amount!');
     if (!walletAddress) throw new Error('Invalid wallet!');
-    if (!Number(balance)) throw new Error('Not enough balance!');
+    if (!Number(balance) || Number(withdrawAmount) < Number(balance)) throw new Error('Not enough balance!');
 
     const totalSupply = await this.krc20.getTotalSupply(pairAddress);
 
-    //liquidity = balance * withdrawPercent / 100
-    const liquidity = new Fraction(balance)
-      .multiply(withdrawPercent)
-      .divide(100)
-      .toFixed();
+    const withdrawPercent = Number(withdrawAmount) / Number(balance) * 100
+
     const tokenABalance = await this.krc20.balanceOf(
       tokenA.tokenAddress,
       pairAddress
@@ -258,7 +255,7 @@ export abstract class KaidexService {
     return {
       tokenA: tokenA.tokenAddress,
       tokenB: tokenB.tokenAddress,
-      liquidity: liquidity,
+      liquidity: withdrawAmount,
       amountAMin: _amountAMin,
       amountBMin: _amountBMin,
       walletAddress,

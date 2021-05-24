@@ -31,7 +31,7 @@ export declare namespace InputParams {
     }
     interface RemoveLiquidity {
         pair: MyLiquidityPair;
-        withdrawPercent: string | number;
+        withdrawAmount: string;
         walletAddress: string;
         slippageTolerance: string | number;
         txDeadline: number;
