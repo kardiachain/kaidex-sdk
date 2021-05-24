@@ -209,11 +209,11 @@ export abstract class KaidexService {
 
     if (!Number(withdrawAmount)) throw new Error('Invalid amount!');
     if (!walletAddress) throw new Error('Invalid wallet!');
-    if (!Number(balance) || Number(withdrawAmount) < Number(balance)) throw new Error('Not enough balance!');
+    if (!Number(balance) || Number(withdrawAmount) > Number(balance)) throw new Error('Not enough balance!');
 
     const totalSupply = await this.krc20.getTotalSupply(pairAddress);
 
-    const withdrawPercent = Number(withdrawAmount) / Number(balance) * 100
+    const withdrawPercent = new Fraction(withdrawAmount).divide(balance).multiply(100)
 
     const tokenABalance = await this.krc20.balanceOf(
       tokenA.tokenAddress,

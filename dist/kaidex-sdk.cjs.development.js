@@ -10,6 +10,7 @@ var JSBI = _interopDefault(require('jsbi'));
 var _Decimal = _interopDefault(require('decimal.js-light'));
 var _Big = _interopDefault(require('big.js'));
 var toFormat = _interopDefault(require('toformat'));
+var bignumber_js = require('bignumber.js');
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
   try {
@@ -3337,18 +3338,8 @@ var cellValue = function cellValue(kaiValue, decimals) {
     decimals = 18;
   }
 
-  var cellString = removeTrailingZeros(kaiValue);
-  var decimalStr = cellString.split('.')[1];
-  var numberStr = cellString.split('.')[0];
-
-  if (!decimalStr) {
-    numberStr = numberStr.padEnd(decimals + numberStr.length, '0');
-  } else {
-    decimalStr = decimalStr.padEnd(decimals, '0');
-  }
-
-  cellString = "" + numberStr + (decimalStr || '');
-  return cellString;
+  var rawValue = new bignumber_js.BigNumber(kaiValue);
+  return rawValue.multipliedBy(new bignumber_js.BigNumber(Math.pow(10, decimals))).toFixed(0, 1);
 };
 
 var convertValueFollowDecimal = function convertValueFollowDecimal(value, decimals) {
@@ -3541,7 +3532,7 @@ var KaidexService = /*#__PURE__*/function () {
                 throw new Error('Invalid wallet!');
 
               case 9:
-                if (!(!Number(balance) || Number(withdrawAmount) < Number(balance))) {
+                if (!(!Number(balance) || Number(withdrawAmount) > Number(balance))) {
                   _context.next = 11;
                   break;
                 }
@@ -3554,7 +3545,7 @@ var KaidexService = /*#__PURE__*/function () {
 
               case 13:
                 totalSupply = _context.sent;
-                withdrawPercent = Number(withdrawAmount) / Number(balance) * 100;
+                withdrawPercent = new Fraction(withdrawAmount).divide(balance).multiply(100);
                 _context.next = 17;
                 return _this.krc20.balanceOf(tokenA.tokenAddress, pairAddress);
 

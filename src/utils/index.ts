@@ -3,18 +3,11 @@ import { Fraction } from '../entities/fraction';
 export const ONE = JSBI.BigInt(1);
 export const TEN = JSBI.BigInt(10);
 const ONE_FRACTION = new Fraction(1);
+import { BigNumber } from "bignumber.js";
 
 const cellValue = (kaiValue: any, decimals: number = 18): string => {
-  let cellString = removeTrailingZeros(kaiValue);
-  let decimalStr = cellString.split('.')[1];
-  let numberStr = cellString.split('.')[0];
-  if (!decimalStr) {
-    numberStr = numberStr.padEnd(decimals + numberStr.length, '0');
-  } else {
-    decimalStr = decimalStr.padEnd(decimals, '0');
-  }
-  cellString = `${numberStr}${decimalStr || ''}`;
-  return cellString;
+  const rawValue = new BigNumber(kaiValue);
+  return rawValue.multipliedBy(new BigNumber(10 ** decimals)).toFixed(0, 1)
 };
 
 const convertValueFollowDecimal = (
