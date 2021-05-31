@@ -56,24 +56,9 @@ export declare namespace SMCParams {
     walletAddress: string;
     deadlineInMilliseconds: number;
   }
-
-  interface SwapParams {
-    exactAmount: string;
-    path: string[];
-    addressTo: string;
-    deadlineInMilliseconds: number;
-  }
-
-  interface OutputSwapParams extends SwapParams {
-    minimumOutputAmountInDecimal: string;
-  }
-
-  interface InputSwapParams extends SwapParams {
-    maximumInputAmountInDecimal: string;
-  }
 }
 
-export interface MyLiquidityPair {
+export interface LiquidityPair {
   balance: string;
   name: string;
   pairAddress: string;
