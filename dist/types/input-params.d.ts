@@ -1,4 +1,4 @@
-import { MyLiquidityPair, Token } from './index';
+import { LiquidityPair, Token } from './index';
 export declare enum TradeType {
     BUY = 0,
     SELL = 1
@@ -30,7 +30,7 @@ export declare namespace InputParams {
         txDeadline: number;
     }
     interface RemoveLiquidity {
-        pair: MyLiquidityPair;
+        pair: LiquidityPair;
         withdrawAmount: string;
         walletAddress: string;
         slippageTolerance: string | number;
