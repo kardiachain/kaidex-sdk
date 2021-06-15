@@ -9,7 +9,7 @@ export class KaidexClient extends KaidexService {
   getPair = (tokenA: string, tokenB: string): Promise<string> =>
     this.factory.getPair(tokenA, tokenB);
 
-  getReverses = (tokenA: string, tokenB: string) =>
+  getReserves = (tokenA: string, tokenB: string) =>
     this.router.getReserves(tokenA, tokenB);
 
   getApprovalState = async ({

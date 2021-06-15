@@ -3741,7 +3741,7 @@ var KaidexClient = /*#__PURE__*/function (_KaidexService) {
       return _this.factory.getPair(tokenA, tokenB);
     };
 
-    _this.getReverses = function (tokenA, tokenB) {
+    _this.getReserves = function (tokenA, tokenB) {
       return _this.router.getReserves(tokenA, tokenB);
     };
 

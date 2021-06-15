@@ -2,7 +2,7 @@ import { KaidexService } from './kaidex-service';
 import { SMCParams, Token, InputParams } from '../types';
 export declare class KaidexClient extends KaidexService {
     getPair: (tokenA: string, tokenB: string) => Promise<string>;
-    getReverses: (tokenA: string, tokenB: string) => Promise<import("../types").PooledTokens>;
+    getReserves: (tokenA: string, tokenB: string) => Promise<import("../types").PooledTokens>;
     getApprovalState: ({ tokenAddr, decimals, walletAddress, spenderAddress, amountToCheck, }: {
         tokenAddr: string;
         decimals: number;
