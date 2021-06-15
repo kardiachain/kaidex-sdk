@@ -1,7 +1,7 @@
 import { KaidexService } from './kaidex-service';
 import JSBI from 'jsbi';
 import { methodNames } from '../constants';
-import { Utils } from '../utils';
+import { ONE, Utils, ZERO, _10000, _9975 } from '../utils';
 import { Fraction } from './fraction';
 import { SMCParams, Token, InputParams, InputType } from '../types';
 
@@ -159,42 +159,58 @@ export class KaidexClient extends KaidexService {
     };
   };
 
-  calculateOutputAmount = async ({
+  calculateOutputAmount = ({
     amount,
     inputToken,
+    reserveIn,
     outputToken,
+    reserveOut,
     inputType,
-  }: InputParams.CalculateOutputAmount): Promise<string> => {
+  }: InputParams.CalculateOutputAmount): string => {
     if (!amount || !inputToken || !outputToken)
       throw new Error('Params input error.');
-    const {
-      tokenAddress: inputTokenAddr,
-      decimals: inputTokenDec,
-    } = inputToken;
-    const {
-      tokenAddress: outputTokenAddr,
-      decimals: outputTokenDec,
-    } = outputToken;
-
+      
     let amountDec;
-    const path = Utils.renderPair(inputTokenAddr, outputTokenAddr);
     let amountOutDec = '';
     let decimals;
-
     switch (inputType) {
       case InputType.EXACT_IN:
-        amountDec = Utils.cellValue(amount, inputTokenDec);
-        amountOutDec = await this.router.getAmountsOut(amountDec, path);
-        decimals = outputTokenDec;
+        amountDec = Utils.cellValue(amount, inputToken.decimals);
+        // Get amount 
+        amountOutDec = this.getOutputAmount(amountDec, reserveIn, reserveOut)
+        decimals = outputToken.decimals;
         break;
       case InputType.EXACT_OUT:
-        amountDec = Utils.cellValue(amount, outputTokenDec);
-        amountOutDec = await this.router.getAmountsIn(amountDec, path);
-        decimals = inputTokenDec;
+        amountDec = Utils.cellValue(amount, outputToken.decimals);
+        amountOutDec = this.getInputAmount(amountDec, reserveIn, reserveOut)
+        decimals = inputToken.decimals;
         break;
     }
     return Utils.convertValueFollowDecimal(amountOutDec, decimals);
   };
+
+  getOutputAmount(inputAmount: string, reserveIn: string, reserveOut: string): string {
+    const reserveInBigInt = JSBI.BigInt(reserveIn)
+    const reserveOutBigInt = JSBI.BigInt(reserveOut)
+    if (JSBI.equal(reserveInBigInt, ZERO) || JSBI.equal(reserveOutBigInt, ZERO)) throw new Error('Insufficient reserves error.');
+    const inputAmountWithFee = JSBI.multiply(JSBI.BigInt(inputAmount), _9975)
+    const numerator = JSBI.multiply(inputAmountWithFee, reserveOutBigInt)
+    const denominator = JSBI.add(JSBI.multiply(reserveInBigInt, _10000), inputAmountWithFee)
+    return JSBI.divide(numerator, denominator).toString()
+  }
+
+  getInputAmount (outputAmount: string, reserveIn: string, reserveOut: string): string {
+    const reserveInBigInt = JSBI.BigInt(reserveIn)
+    const reserveOutBigInt = JSBI.BigInt(reserveOut)
+    if (JSBI.equal(reserveInBigInt, ZERO) ||
+      JSBI.equal(reserveOutBigInt, ZERO) ||
+      JSBI.greaterThanOrEqual(JSBI.BigInt(outputAmount), reserveOutBigInt)) throw new Error('Insufficient reserves error.');
+    const numerator = JSBI.multiply(JSBI.multiply(reserveInBigInt, JSBI.BigInt(outputAmount)), _10000)
+    const denominator = JSBI.multiply(JSBI.subtract(reserveOutBigInt, JSBI.BigInt(outputAmount)), _9975)
+
+    return JSBI.add(JSBI.divide(numerator, denominator), ONE).toString()
+  }
+
 
   calculatePriceImpact = async ({
     inputToken,
@@ -225,15 +241,15 @@ export class KaidexClient extends KaidexService {
 
     const reserveAConvertBigInt = inputTokenDec
       ? new Fraction(
-          JSBI.BigInt(reserveA),
-          JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(inputTokenDec))
-        )
+        JSBI.BigInt(reserveA),
+        JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(inputTokenDec))
+      )
       : new Fraction(JSBI.BigInt(reserveA));
     const reserveBConvertBigInt = outputTokenDec
       ? new Fraction(
-          JSBI.BigInt(reserveB),
-          JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(outputTokenDec))
-        )
+        JSBI.BigInt(reserveB),
+        JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(outputTokenDec))
+      )
       : new Fraction(JSBI.BigInt(reserveB));
     const midPrice = reserveBConvertBigInt.divide(reserveAConvertBigInt);
 

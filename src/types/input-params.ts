@@ -16,6 +16,8 @@ export declare namespace InputParams {
     inputToken: Token;
     outputToken: Token;
     inputType: InputType;
+    reserveIn: string;
+    reserveOut: string;
   }
 
   interface CalculatePriceImpact {
