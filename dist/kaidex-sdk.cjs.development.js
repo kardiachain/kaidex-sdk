@@ -3330,7 +3330,8 @@ var KRC20Service = /*#__PURE__*/function (_AbstractSmcService) {
   return KRC20Service;
 }(AbstractSmcService);
 
-var TEN = /*#__PURE__*/JSBI.BigInt(10);
+var ZERO = /*#__PURE__*/JSBI.BigInt(0);
+var ONE$1 = /*#__PURE__*/JSBI.BigInt(1);
 var ONE_FRACTION = /*#__PURE__*/new Fraction(1);
 
 var cellValue = function cellValue(kaiValue, decimals) {
@@ -3344,21 +3345,20 @@ var cellValue = function cellValue(kaiValue, decimals) {
 
 var convertValueFollowDecimal = function convertValueFollowDecimal(value, decimals) {
   try {
-    var valueFrac = typeof value === 'string' ? new Fraction(value) : value;
-
-    if (valueFrac.equalTo(0)) {
+    if (!value || value === '0') {
       return '0';
     }
 
-    if (decimals === undefined || decimals === null) {
-      return valueFrac.toFixed();
+    if (!decimals) {
+      return value;
     }
 
-    var DecimalsbigNum = JSBI.BigInt(decimals);
-    var parseB = JSBI.exponentiate(TEN, DecimalsbigNum).toString();
-    return removeTrailingZeros(valueFrac.divide(parseB).toFixed(decimals));
+    var rawValue = new bignumber_js.BigNumber(value);
+    var rawTEN = new bignumber_js.BigNumber(10);
+    var result = rawValue.dividedBy(rawTEN.exponentiatedBy(decimals));
+    return removeTrailingZeros(result.toFixed(decimals));
   } catch (error) {
-    console.error('Error converting value from decimal:', error);
+    console.error("Error converting value from decimal:", error);
     return '0';
   }
 };
@@ -3417,6 +3417,8 @@ var renderPair = function renderPair(tokenIn, tokenOut) {
   return [tokenIn, tokenOut];
 };
 
+var _9975 = /*#__PURE__*/JSBI.BigInt(9975);
+var _10000 = /*#__PURE__*/JSBI.BigInt(10000);
 var Utils = {
   cellValue: cellValue,
   convertValueFollowDecimal: convertValueFollowDecimal,
@@ -3886,79 +3888,48 @@ var KaidexClient = /*#__PURE__*/function (_KaidexService) {
       };
     }();
 
-    _this.calculateOutputAmount = /*#__PURE__*/function () {
-      var _ref5 = _asyncToGenerator( /*#__PURE__*/runtime_1.mark(function _callee3(_ref4) {
-        var amount, inputToken, outputToken, inputType, inputTokenAddr, inputTokenDec, outputTokenAddr, outputTokenDec, amountDec, path, amountOutDec, decimals;
+    _this.calculateOutputAmount = function (_ref4) {
+      var amount = _ref4.amount,
+          inputToken = _ref4.inputToken,
+          reserveIn = _ref4.reserveIn,
+          outputToken = _ref4.outputToken,
+          reserveOut = _ref4.reserveOut,
+          inputType = _ref4.inputType;
+      if (!amount || !inputToken || !outputToken) throw new Error('Params input error.');
+      var amountDec;
+      var amountOutDec = '';
+      var decimals;
+
+      switch (inputType) {
+        case exports.InputType.EXACT_IN:
+          amountDec = Utils.cellValue(amount, inputToken.decimals); // Get amount 
+
+          amountOutDec = _this.getOutputAmount(amountDec, reserveIn, reserveOut);
+          decimals = outputToken.decimals;
+          break;
+
+        case exports.InputType.EXACT_OUT:
+          amountDec = Utils.cellValue(amount, outputToken.decimals);
+          amountOutDec = _this.getInputAmount(amountDec, reserveIn, reserveOut);
+          decimals = inputToken.decimals;
+          break;
+      }
+
+      return Utils.convertValueFollowDecimal(amountOutDec, decimals);
+    };
+
+    _this.calculatePriceImpact = /*#__PURE__*/function () {
+      var _ref6 = _asyncToGenerator( /*#__PURE__*/runtime_1.mark(function _callee3(_ref5) {
+        var inputToken, outputToken, amountIn, amountOut, inputTokenDec, inputTokenAddr, outputTokenDec, outputTokenAddr, _yield$_this$router$g, reserveA, reserveB, amountInDec, amountOutDec, reserveAConvertBigInt, reserveBConvertBigInt, midPrice, amountInFrac, amountOutFrac, exactQuote, slippage;
+
         return runtime_1.wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                amount = _ref4.amount, inputToken = _ref4.inputToken, outputToken = _ref4.outputToken, inputType = _ref4.inputType;
-
-                if (!(!amount || !inputToken || !outputToken)) {
-                  _context3.next = 3;
-                  break;
-                }
-
-                throw new Error('Params input error.');
-
-              case 3:
-                inputTokenAddr = inputToken.tokenAddress, inputTokenDec = inputToken.decimals;
-                outputTokenAddr = outputToken.tokenAddress, outputTokenDec = outputToken.decimals;
-                path = Utils.renderPair(inputTokenAddr, outputTokenAddr);
-                amountOutDec = '';
-                _context3.t0 = inputType;
-                _context3.next = _context3.t0 === exports.InputType.EXACT_IN ? 10 : _context3.t0 === exports.InputType.EXACT_OUT ? 16 : 22;
-                break;
-
-              case 10:
-                amountDec = Utils.cellValue(amount, inputTokenDec);
-                _context3.next = 13;
-                return _this.router.getAmountsOut(amountDec, path);
-
-              case 13:
-                amountOutDec = _context3.sent;
-                decimals = outputTokenDec;
-                return _context3.abrupt("break", 22);
-
-              case 16:
-                amountDec = Utils.cellValue(amount, outputTokenDec);
-                _context3.next = 19;
-                return _this.router.getAmountsIn(amountDec, path);
-
-              case 19:
-                amountOutDec = _context3.sent;
-                decimals = inputTokenDec;
-                return _context3.abrupt("break", 22);
-
-              case 22:
-                return _context3.abrupt("return", Utils.convertValueFollowDecimal(amountOutDec, decimals));
-
-              case 23:
-              case "end":
-                return _context3.stop();
-            }
-          }
-        }, _callee3);
-      }));
-
-      return function (_x3) {
-        return _ref5.apply(this, arguments);
-      };
-    }();
-
-    _this.calculatePriceImpact = /*#__PURE__*/function () {
-      var _ref7 = _asyncToGenerator( /*#__PURE__*/runtime_1.mark(function _callee4(_ref6) {
-        var inputToken, outputToken, amountIn, amountOut, inputTokenDec, inputTokenAddr, outputTokenDec, outputTokenAddr, _yield$_this$router$g, reserveA, reserveB, amountInDec, amountOutDec, reserveAConvertBigInt, reserveBConvertBigInt, midPrice, amountInFrac, amountOutFrac, exactQuote, slippage;
-
-        return runtime_1.wrap(function _callee4$(_context4) {
-          while (1) {
-            switch (_context4.prev = _context4.next) {
-              case 0:
-                inputToken = _ref6.inputToken, outputToken = _ref6.outputToken, amountIn = _ref6.amountIn, amountOut = _ref6.amountOut;
+                inputToken = _ref5.inputToken, outputToken = _ref5.outputToken, amountIn = _ref5.amountIn, amountOut = _ref5.amountOut;
 
                 if (!(!inputToken || !outputToken || !amountIn || !amountOut)) {
-                  _context4.next = 3;
+                  _context3.next = 3;
                   break;
                 }
 
@@ -3967,20 +3938,20 @@ var KaidexClient = /*#__PURE__*/function (_KaidexService) {
               case 3:
                 inputTokenDec = inputToken.decimals, inputTokenAddr = inputToken.tokenAddress;
                 outputTokenDec = outputToken.decimals, outputTokenAddr = outputToken.tokenAddress;
-                _context4.next = 7;
+                _context3.next = 7;
                 return _this.router.getReserves(inputTokenAddr, outputTokenAddr);
 
               case 7:
-                _yield$_this$router$g = _context4.sent;
+                _yield$_this$router$g = _context3.sent;
                 reserveA = _yield$_this$router$g.reserveA;
                 reserveB = _yield$_this$router$g.reserveB;
 
                 if (!(!reserveA || reserveA === '0' || !reserveB || reserveB === '0')) {
-                  _context4.next = 12;
+                  _context3.next = 12;
                   break;
                 }
 
-                return _context4.abrupt("return", '0');
+                return _context3.abrupt("return", '0');
 
               case 12:
                 amountInDec = Utils.cellValue(amountIn, inputTokenDec);
@@ -3992,34 +3963,34 @@ var KaidexClient = /*#__PURE__*/function (_KaidexService) {
                 amountOutFrac = new Fraction(amountOutDec, JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(outputTokenDec)));
                 exactQuote = midPrice.multiply(amountInFrac);
                 slippage = exactQuote.subtract(amountOutFrac).divide(exactQuote);
-                return _context4.abrupt("return", slippage.multiply(100).toFixed(5));
+                return _context3.abrupt("return", slippage.multiply(100).toFixed(5));
 
               case 22:
               case "end":
-                return _context4.stop();
+                return _context3.stop();
             }
           }
-        }, _callee4);
+        }, _callee3);
       }));
 
-      return function (_x4) {
-        return _ref7.apply(this, arguments);
+      return function (_x3) {
+        return _ref6.apply(this, arguments);
       };
     }();
 
     _this.calculateExchangeRate = /*#__PURE__*/function () {
-      var _ref8 = _asyncToGenerator( /*#__PURE__*/runtime_1.mark(function _callee5(tokenA, tokenB) {
+      var _ref7 = _asyncToGenerator( /*#__PURE__*/runtime_1.mark(function _callee4(tokenA, tokenB) {
         var _yield$_this$router$g2, reserveA, reserveB, tokenAValue, tokenBValue, _tokenAValue, _tokenBValue, rateAB, rateBA;
 
-        return runtime_1.wrap(function _callee5$(_context5) {
+        return runtime_1.wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context5.prev = _context5.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
-                _context5.next = 2;
+                _context4.next = 2;
                 return _this.router.getReserves(tokenA.tokenAddress, tokenB.tokenAddress);
 
               case 2:
-                _yield$_this$router$g2 = _context5.sent;
+                _yield$_this$router$g2 = _context4.sent;
                 reserveA = _yield$_this$router$g2.reserveA;
                 reserveB = _yield$_this$router$g2.reserveB;
                 tokenAValue = Utils.convertValueFollowDecimal(JSBI.BigInt(reserveA).toString(), tokenA.decimals);
@@ -4028,33 +3999,33 @@ var KaidexClient = /*#__PURE__*/function (_KaidexService) {
                 _tokenBValue = Number(tokenBValue);
                 rateAB = _tokenAValue ? _tokenBValue / _tokenAValue : 0;
                 rateBA = _tokenBValue ? _tokenAValue / _tokenBValue : 0;
-                return _context5.abrupt("return", {
+                return _context4.abrupt("return", {
                   rateAB: rateAB,
                   rateBA: rateBA
                 });
 
               case 12:
               case "end":
-                return _context5.stop();
+                return _context4.stop();
             }
           }
-        }, _callee5);
+        }, _callee4);
       }));
 
-      return function (_x5, _x6) {
-        return _ref8.apply(this, arguments);
+      return function (_x4, _x5) {
+        return _ref7.apply(this, arguments);
       };
     }();
 
-    _this.marketSwapCallParameters = function (_ref9) {
-      var amountIn = _ref9.amountIn,
-          amountOut = _ref9.amountOut,
-          inputToken = _ref9.inputToken,
-          outputToken = _ref9.outputToken,
-          addressTo = _ref9.addressTo,
-          inputType = _ref9.inputType,
-          txDeadline = _ref9.txDeadline,
-          slippageTolerance = _ref9.slippageTolerance;
+    _this.marketSwapCallParameters = function (_ref8) {
+      var amountIn = _ref8.amountIn,
+          amountOut = _ref8.amountOut,
+          inputToken = _ref8.inputToken,
+          outputToken = _ref8.outputToken,
+          addressTo = _ref8.addressTo,
+          inputType = _ref8.inputType,
+          txDeadline = _ref8.txDeadline,
+          slippageTolerance = _ref8.slippageTolerance;
       if (!amountIn || !amountOut || !addressTo || !inputToken || !outputToken) throw new Error('Params input error.');
 
       var kaiIn = _this.isKAI(inputToken.tokenAddress);
@@ -4115,13 +4086,13 @@ var KaidexClient = /*#__PURE__*/function (_KaidexService) {
       return swapParams;
     };
 
-    _this.limitOrderCallParameters = function (_ref10) {
-      var amountIn = _ref10.amountIn,
-          amountOut = _ref10.amountOut,
-          inputToken = _ref10.inputToken,
-          outputToken = _ref10.outputToken,
-          inputType = _ref10.inputType,
-          tradeType = _ref10.tradeType;
+    _this.limitOrderCallParameters = function (_ref9) {
+      var amountIn = _ref9.amountIn,
+          amountOut = _ref9.amountOut,
+          inputToken = _ref9.inputToken,
+          outputToken = _ref9.outputToken,
+          inputType = _ref9.inputType,
+          tradeType = _ref9.tradeType;
       if (!amountIn || !amountOut || !inputToken || !outputToken) throw new Error('Params input error.');
       var inputTokenAddr = inputToken.tokenAddress,
           inputTokenDec = inputToken.decimals;
@@ -4150,9 +4121,9 @@ var KaidexClient = /*#__PURE__*/function (_KaidexService) {
       return swapParams;
     };
 
-    _this.cancelLimitOrder = function (_ref11) {
-      var pairAddr = _ref11.pairAddr,
-          orderID = _ref11.orderID;
+    _this.cancelLimitOrder = function (_ref10) {
+      var pairAddr = _ref10.pairAddr,
+          orderID = _ref10.orderID;
       if (!pairAddr || !orderID) throw new Error('Params input error.');
       return {
         methodName: methodNames.CANCEL_ORDER,
@@ -4162,6 +4133,27 @@ var KaidexClient = /*#__PURE__*/function (_KaidexService) {
 
     return _this;
   }
+
+  var _proto = KaidexClient.prototype;
+
+  _proto.getOutputAmount = function getOutputAmount(inputAmount, reserveIn, reserveOut) {
+    var reserveInBigInt = JSBI.BigInt(reserveIn);
+    var reserveOutBigInt = JSBI.BigInt(reserveOut);
+    if (JSBI.equal(reserveInBigInt, ZERO) || JSBI.equal(reserveOutBigInt, ZERO)) throw new Error('Insufficient reserves error.');
+    var inputAmountWithFee = JSBI.multiply(JSBI.BigInt(inputAmount), _9975);
+    var numerator = JSBI.multiply(inputAmountWithFee, reserveOutBigInt);
+    var denominator = JSBI.add(JSBI.multiply(reserveInBigInt, _10000), inputAmountWithFee);
+    return JSBI.divide(numerator, denominator).toString();
+  };
+
+  _proto.getInputAmount = function getInputAmount(outputAmount, reserveIn, reserveOut) {
+    var reserveInBigInt = JSBI.BigInt(reserveIn);
+    var reserveOutBigInt = JSBI.BigInt(reserveOut);
+    if (JSBI.equal(reserveInBigInt, ZERO) || JSBI.equal(reserveOutBigInt, ZERO) || JSBI.greaterThanOrEqual(JSBI.BigInt(outputAmount), reserveOutBigInt)) throw new Error('Insufficient reserves error.');
+    var numerator = JSBI.multiply(JSBI.multiply(reserveInBigInt, JSBI.BigInt(outputAmount)), _10000);
+    var denominator = JSBI.multiply(JSBI.subtract(reserveOutBigInt, JSBI.BigInt(outputAmount)), _9975);
+    return JSBI.add(JSBI.divide(numerator, denominator), ONE$1).toString();
+  };
 
   return KaidexClient;
 }(KaidexService);

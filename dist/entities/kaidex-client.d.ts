@@ -13,7 +13,9 @@ export declare class KaidexClient extends KaidexService {
     getTokenBalance: (tokenAddress: string, walletAddress: string) => Promise<string>;
     addLiquidityCallParameters: (params: InputParams.AddLiquidity) => SMCParams.CallParams;
     removeLiquidityCallParameters: (params: InputParams.RemoveLiquidity) => Promise<SMCParams.CallParams>;
-    calculateOutputAmount: ({ amount, inputToken, outputToken, inputType, }: InputParams.CalculateOutputAmount) => Promise<string>;
+    calculateOutputAmount: ({ amount, inputToken, reserveIn, outputToken, reserveOut, inputType, }: InputParams.CalculateOutputAmount) => string;
+    getOutputAmount(inputAmount: string, reserveIn: string, reserveOut: string): string;
+    getInputAmount(outputAmount: string, reserveIn: string, reserveOut: string): string;
     calculatePriceImpact: ({ inputToken, outputToken, amountIn, amountOut, }: InputParams.CalculatePriceImpact) => Promise<string>;
     calculateExchangeRate: (tokenA: Token, tokenB: Token) => Promise<{
         rateAB: number;
