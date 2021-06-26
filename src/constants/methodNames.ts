@@ -20,7 +20,7 @@ export const methodNames = {
   SWAP_KAI_FOR_EXACT_TOKENS: 'swapKAIForExactTokens',
   SWAP_EXACT_TOKEN_FOR_TOKEN_SUPPORTING_ON_FEE_TRANSFER : 'swapExactTokensForTokensSupportingFeeOnTransferTokens',
   SWAP_EXACT_KAI_FOR_TOKEN_SUPPORTING_ON_FEE_TRANSFER : 'swapExactKAIForTokensSupportingFeeOnTransferTokens',
-  SWAP_EXACT_TOKEN_FOR_KAI_SUPPORTING_ON_FEE_TRANSFER : 'swapExactTokensForTokensSupportingFeeOnTransferTokens',
+  SWAP_EXACT_TOKEN_FOR_KAI_SUPPORTING_ON_FEE_TRANSFER : 'swapExactTokensForKAISupportingFeeOnTransferTokens',
 
   //KRC20
   APPROVE: 'approve',
