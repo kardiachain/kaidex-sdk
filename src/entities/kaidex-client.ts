@@ -304,6 +304,7 @@ export class KaidexClient extends KaidexService {
     inputType,
     txDeadline,
     slippageTolerance,
+    feeOnTransfer
   }: InputParams.MarketSwap): SMCParams.CallParams => {
     if (!amountIn || !amountOut || !addressTo || !inputToken || !outputToken)
       throw new Error('Params input error.');
@@ -331,18 +332,18 @@ export class KaidexClient extends KaidexService {
       case InputType.EXACT_IN:
         if (kaiIn) {
           swapParams = {
-            methodName: methodNames.SWAP_EXACT_KAI_FOR_TOKENS,
+            methodName: feeOnTransfer ? methodNames.SWAP_EXACT_KAI_FOR_TOKEN_SUPPORTING_ON_FEE_TRANSFER : methodNames.SWAP_EXACT_KAI_FOR_TOKENS,
             args: [amountOutMinDec, path, addressTo, txDeadline],
             amount: amountInDec,
           } as SMCParams.CallParams;
         } else if (kaiOut) {
           swapParams = {
-            methodName: methodNames.SWAP_EXACT_TOKENS_FOR_KAI,
+            methodName: feeOnTransfer ? methodNames.SWAP_EXACT_TOKEN_FOR_KAI_SUPPORTING_ON_FEE_TRANSFER : methodNames.SWAP_EXACT_TOKENS_FOR_KAI,
             args: [amountInDec, amountOutMinDec, path, addressTo, txDeadline],
           };
         } else {
           swapParams = {
-            methodName: methodNames.SWAP_EXACT_TOKENS_FOR_TOKENS,
+            methodName: feeOnTransfer ? methodNames.SWAP_EXACT_TOKEN_FOR_TOKEN_SUPPORTING_ON_FEE_TRANSFER : methodNames.SWAP_EXACT_TOKENS_FOR_TOKENS,
             args: [amountInDec, amountOutMinDec, path, addressTo, txDeadline],
           };
         }

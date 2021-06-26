@@ -6,6 +6,7 @@ export declare const methodNames: {
     GET_TOTAL_KAI_AMOUNTS_IN: string;
     ADD_LIQUIDITY: string;
     ADD_LIQUIDITY_KAI: string;
+    ADD_LIQUIDITY_SUPPORTING_FEE: string;
     REMOVE_LIQUIDITY: string;
     REMOVE_LIQUIDITY_KAI: string;
     SWAP_EXACT_TOKENS_FOR_TOKENS: string;
@@ -14,6 +15,9 @@ export declare const methodNames: {
     SWAP_EXACT_TOKENS_FOR_KAI: string;
     SWAP_TOKENS_FOR_EXACT_KAI: string;
     SWAP_KAI_FOR_EXACT_TOKENS: string;
+    SWAP_EXACT_TOKEN_FOR_TOKEN_SUPPORTING_ON_FEE_TRANSFER: string;
+    SWAP_EXACT_KAI_FOR_TOKEN_SUPPORTING_ON_FEE_TRANSFER: string;
+    SWAP_EXACT_TOKEN_FOR_KAI_SUPPORTING_ON_FEE_TRANSFER: string;
     APPROVE: string;
     ALLOWANCE: string;
     BALANCE_OF: string;

@@ -54,6 +54,7 @@ export declare namespace InputParams {
     inputType: InputType;
     txDeadline: number;
     slippageTolerance: string | number;
+    feeOnTransfer: boolean
   }
 
   interface LimitOrder {

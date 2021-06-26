@@ -1264,6 +1264,50 @@ var ROUTER = [
 	{
 		inputs: [
 			{
+				internalType: "address",
+				name: "token",
+				type: "address"
+			},
+			{
+				internalType: "uint256",
+				name: "liquidity",
+				type: "uint256"
+			},
+			{
+				internalType: "uint256",
+				name: "amountTokenMin",
+				type: "uint256"
+			},
+			{
+				internalType: "uint256",
+				name: "amountETHMin",
+				type: "uint256"
+			},
+			{
+				internalType: "address",
+				name: "to",
+				type: "address"
+			},
+			{
+				internalType: "uint256",
+				name: "deadline",
+				type: "uint256"
+			}
+		],
+		name: "removeLiquidityKAISupportingFeeOnTransferTokens",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "amountKAI",
+				type: "uint256"
+			}
+		],
+		stateMutability: "nonpayable",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
 				internalType: "uint256",
 				name: "amountOutMin",
 				type: "uint256"
@@ -1291,6 +1335,35 @@ var ROUTER = [
 				name: "amounts",
 				type: "uint256[]"
 			}
+		],
+		stateMutability: "payable",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "uint256",
+				name: "amountOutMin",
+				type: "uint256"
+			},
+			{
+				internalType: "address[]",
+				name: "path",
+				type: "address[]"
+			},
+			{
+				internalType: "address",
+				name: "to",
+				type: "address"
+			},
+			{
+				internalType: "uint256",
+				name: "deadline",
+				type: "uint256"
+			}
+		],
+		name: "swapExactKAIForTokensSupportingFeeOnTransferTokens",
+		outputs: [
 		],
 		stateMutability: "payable",
 		type: "function"
@@ -1362,6 +1435,40 @@ var ROUTER = [
 				type: "uint256"
 			}
 		],
+		name: "swapExactTokensForKAISupportingFeeOnTransferTokens",
+		outputs: [
+		],
+		stateMutability: "nonpayable",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "uint256",
+				name: "amountIn",
+				type: "uint256"
+			},
+			{
+				internalType: "uint256",
+				name: "amountOutMin",
+				type: "uint256"
+			},
+			{
+				internalType: "address[]",
+				name: "path",
+				type: "address[]"
+			},
+			{
+				internalType: "address",
+				name: "to",
+				type: "address"
+			},
+			{
+				internalType: "uint256",
+				name: "deadline",
+				type: "uint256"
+			}
+		],
 		name: "swapExactTokensForTokens",
 		outputs: [
 			{
@@ -1371,6 +1478,40 @@ var ROUTER = [
 			}
 		],
 		stateMutability: "payable",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "uint256",
+				name: "amountIn",
+				type: "uint256"
+			},
+			{
+				internalType: "uint256",
+				name: "amountOutMin",
+				type: "uint256"
+			},
+			{
+				internalType: "address[]",
+				name: "path",
+				type: "address[]"
+			},
+			{
+				internalType: "address",
+				name: "to",
+				type: "address"
+			},
+			{
+				internalType: "uint256",
+				name: "deadline",
+				type: "uint256"
+			}
+		],
+		name: "swapExactTokensForTokensSupportingFeeOnTransferTokens",
+		outputs: [
+		],
+		stateMutability: "nonpayable",
 		type: "function"
 	},
 	{
@@ -2861,6 +3002,7 @@ var methodNames = {
   GET_TOTAL_KAI_AMOUNTS_IN: 'getTotalKAIAmountsIn',
   ADD_LIQUIDITY: 'addLiquidity',
   ADD_LIQUIDITY_KAI: 'addLiquidityKAI',
+  ADD_LIQUIDITY_SUPPORTING_FEE: 'swapExactTokensForTokensSupportingFeeOnTransferTokens',
   REMOVE_LIQUIDITY: 'removeLiquidity',
   REMOVE_LIQUIDITY_KAI: 'removeLiquidityKAI',
   SWAP_EXACT_TOKENS_FOR_TOKENS: 'swapExactTokensForTokens',
@@ -2869,6 +3011,9 @@ var methodNames = {
   SWAP_EXACT_TOKENS_FOR_KAI: 'swapExactTokensForKAI',
   SWAP_TOKENS_FOR_EXACT_KAI: 'swapTokensForExactKAI',
   SWAP_KAI_FOR_EXACT_TOKENS: 'swapKAIForExactTokens',
+  SWAP_EXACT_TOKEN_FOR_TOKEN_SUPPORTING_ON_FEE_TRANSFER: 'swapExactTokensForTokensSupportingFeeOnTransferTokens',
+  SWAP_EXACT_KAI_FOR_TOKEN_SUPPORTING_ON_FEE_TRANSFER: 'swapExactKAIForTokensSupportingFeeOnTransferTokens',
+  SWAP_EXACT_TOKEN_FOR_KAI_SUPPORTING_ON_FEE_TRANSFER: 'swapExactTokensForTokensSupportingFeeOnTransferTokens',
   //KRC20
   APPROVE: 'approve',
   ALLOWANCE: 'allowance',
@@ -3729,6 +3874,7 @@ var InputType;
   InputType[InputType["EXACT_OUT"] = 1] = "EXACT_OUT";
 })(InputType || (InputType = {}));
 
+var BOSS_DOGE_ADDRESS = '0x5995F16246DfA676A44B8bD7E751C1226093dcd7';
 var KaidexClient = /*#__PURE__*/function (_KaidexService) {
   _inheritsLoose(KaidexClient, _KaidexService);
 
@@ -3825,7 +3971,7 @@ var KaidexClient = /*#__PURE__*/function (_KaidexService) {
 
     _this.removeLiquidityCallParameters = /*#__PURE__*/function () {
       var _ref3 = _asyncToGenerator( /*#__PURE__*/runtime_1.mark(function _callee2(params) {
-        var _params$pair, inputToken, outputToken, _yield$_this$transfor, tokenAddress, _liquidity, amountKAIMin, amountTokenMin, _walletAddress2, _deadlineInMilliseconds2, _yield$_this$transfor2, tokenA, tokenB, liquidity, amountAMin, amountBMin, walletAddress, deadlineInMilliseconds;
+        var _params$pair, inputToken, outputToken, _yield$_this$transfor, tokenAddress, _liquidity, amountKAIMin, amountTokenMin, _walletAddress2, _deadlineInMilliseconds2, methodName, _yield$_this$transfor2, tokenA, tokenB, liquidity, amountAMin, amountBMin, walletAddress, deadlineInMilliseconds;
 
         return runtime_1.wrap(function _callee2$(_context2) {
           while (1) {
@@ -3834,7 +3980,7 @@ var KaidexClient = /*#__PURE__*/function (_KaidexService) {
                 _params$pair = params.pair, inputToken = _params$pair.tokenA, outputToken = _params$pair.tokenB; // For KAI Pairs
 
                 if (!(_this.isKAI(inputToken.tokenAddress) || _this.isKAI(outputToken.tokenAddress))) {
-                  _context2.next = 12;
+                  _context2.next = 13;
                   break;
                 }
 
@@ -3849,16 +3995,17 @@ var KaidexClient = /*#__PURE__*/function (_KaidexService) {
                 amountTokenMin = _yield$_this$transfor.amountTokenMin;
                 _walletAddress2 = _yield$_this$transfor.walletAddress;
                 _deadlineInMilliseconds2 = _yield$_this$transfor.deadlineInMilliseconds;
+                methodName = inputToken.tokenAddress === BOSS_DOGE_ADDRESS || outputToken.tokenAddress === BOSS_DOGE_ADDRESS ? methodNames.REMOVE_LIQUIDITY_KAI : methodNames.ADD_LIQUIDITY_SUPPORTING_FEE;
                 return _context2.abrupt("return", {
-                  methodName: methodNames.REMOVE_LIQUIDITY_KAI,
+                  methodName: methodName,
                   args: [tokenAddress, _liquidity, amountTokenMin, amountKAIMin, _walletAddress2, _deadlineInMilliseconds2]
                 });
 
-              case 12:
-                _context2.next = 14;
+              case 13:
+                _context2.next = 15;
                 return _this.transformRemoveLiquidityParams(params);
 
-              case 14:
+              case 15:
                 _yield$_this$transfor2 = _context2.sent;
                 tokenA = _yield$_this$transfor2.tokenA;
                 tokenB = _yield$_this$transfor2.tokenB;
@@ -3872,7 +4019,7 @@ var KaidexClient = /*#__PURE__*/function (_KaidexService) {
                   args: [tokenA, tokenB, liquidity, amountAMin, amountBMin, walletAddress, deadlineInMilliseconds]
                 });
 
-              case 23:
+              case 24:
               case "end":
                 return _context2.stop();
             }
@@ -4022,7 +4169,8 @@ var KaidexClient = /*#__PURE__*/function (_KaidexService) {
           addressTo = _ref8.addressTo,
           inputType = _ref8.inputType,
           txDeadline = _ref8.txDeadline,
-          slippageTolerance = _ref8.slippageTolerance;
+          slippageTolerance = _ref8.slippageTolerance,
+          feeOnTransfer = _ref8.feeOnTransfer;
       if (!amountIn || !amountOut || !addressTo || !inputToken || !outputToken) throw new Error('Params input error.');
 
       var kaiIn = _this.isKAI(inputToken.tokenAddress);
@@ -4040,18 +4188,18 @@ var KaidexClient = /*#__PURE__*/function (_KaidexService) {
         case InputType.EXACT_IN:
           if (kaiIn) {
             swapParams = {
-              methodName: methodNames.SWAP_EXACT_KAI_FOR_TOKENS,
+              methodName: feeOnTransfer ? methodNames.SWAP_EXACT_KAI_FOR_TOKEN_SUPPORTING_ON_FEE_TRANSFER : methodNames.SWAP_EXACT_KAI_FOR_TOKENS,
               args: [amountOutMinDec, path, addressTo, txDeadline],
               amount: amountInDec
             };
           } else if (kaiOut) {
             swapParams = {
-              methodName: methodNames.SWAP_EXACT_TOKENS_FOR_KAI,
+              methodName: feeOnTransfer ? methodNames.SWAP_EXACT_TOKEN_FOR_KAI_SUPPORTING_ON_FEE_TRANSFER : methodNames.SWAP_EXACT_TOKENS_FOR_KAI,
               args: [amountInDec, amountOutMinDec, path, addressTo, txDeadline]
             };
           } else {
             swapParams = {
-              methodName: methodNames.SWAP_EXACT_TOKENS_FOR_TOKENS,
+              methodName: feeOnTransfer ? methodNames.SWAP_EXACT_TOKEN_FOR_TOKEN_SUPPORTING_ON_FEE_TRANSFER : methodNames.SWAP_EXACT_TOKENS_FOR_TOKENS,
               args: [amountInDec, amountOutMinDec, path, addressTo, txDeadline]
             };
           }
