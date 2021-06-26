@@ -3874,7 +3874,6 @@ var InputType;
   InputType[InputType["EXACT_OUT"] = 1] = "EXACT_OUT";
 })(InputType || (InputType = {}));
 
-var BOSS_DOGE_ADDRESS = '0x5995F16246DfA676A44B8bD7E751C1226093dcd7';
 var KaidexClient = /*#__PURE__*/function (_KaidexService) {
   _inheritsLoose(KaidexClient, _KaidexService);
 
@@ -3971,7 +3970,7 @@ var KaidexClient = /*#__PURE__*/function (_KaidexService) {
 
     _this.removeLiquidityCallParameters = /*#__PURE__*/function () {
       var _ref3 = _asyncToGenerator( /*#__PURE__*/runtime_1.mark(function _callee2(params) {
-        var _params$pair, inputToken, outputToken, _yield$_this$transfor, tokenAddress, _liquidity, amountKAIMin, amountTokenMin, _walletAddress2, _deadlineInMilliseconds2, methodName, _yield$_this$transfor2, tokenA, tokenB, liquidity, amountAMin, amountBMin, walletAddress, deadlineInMilliseconds;
+        var _params$pair, inputToken, outputToken, _yield$_this$transfor, tokenAddress, _liquidity, amountKAIMin, amountTokenMin, _walletAddress2, _deadlineInMilliseconds2, _yield$_this$transfor2, tokenA, tokenB, liquidity, amountAMin, amountBMin, walletAddress, deadlineInMilliseconds;
 
         return runtime_1.wrap(function _callee2$(_context2) {
           while (1) {
@@ -3980,7 +3979,7 @@ var KaidexClient = /*#__PURE__*/function (_KaidexService) {
                 _params$pair = params.pair, inputToken = _params$pair.tokenA, outputToken = _params$pair.tokenB; // For KAI Pairs
 
                 if (!(_this.isKAI(inputToken.tokenAddress) || _this.isKAI(outputToken.tokenAddress))) {
-                  _context2.next = 13;
+                  _context2.next = 12;
                   break;
                 }
 
@@ -3995,17 +3994,16 @@ var KaidexClient = /*#__PURE__*/function (_KaidexService) {
                 amountTokenMin = _yield$_this$transfor.amountTokenMin;
                 _walletAddress2 = _yield$_this$transfor.walletAddress;
                 _deadlineInMilliseconds2 = _yield$_this$transfor.deadlineInMilliseconds;
-                methodName = inputToken.tokenAddress === BOSS_DOGE_ADDRESS || outputToken.tokenAddress === BOSS_DOGE_ADDRESS ? methodNames.REMOVE_LIQUIDITY_KAI : methodNames.ADD_LIQUIDITY_SUPPORTING_FEE;
                 return _context2.abrupt("return", {
-                  methodName: methodName,
+                  methodName: methodNames.REMOVE_LIQUIDITY_KAI,
                   args: [tokenAddress, _liquidity, amountTokenMin, amountKAIMin, _walletAddress2, _deadlineInMilliseconds2]
                 });
 
-              case 13:
-                _context2.next = 15;
+              case 12:
+                _context2.next = 14;
                 return _this.transformRemoveLiquidityParams(params);
 
-              case 15:
+              case 14:
                 _yield$_this$transfor2 = _context2.sent;
                 tokenA = _yield$_this$transfor2.tokenA;
                 tokenB = _yield$_this$transfor2.tokenB;
@@ -4019,7 +4017,7 @@ var KaidexClient = /*#__PURE__*/function (_KaidexService) {
                   args: [tokenA, tokenB, liquidity, amountAMin, amountBMin, walletAddress, deadlineInMilliseconds]
                 });
 
-              case 24:
+              case 23:
               case "end":
                 return _context2.stop();
             }
