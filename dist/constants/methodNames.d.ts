@@ -6,7 +6,7 @@ export declare const methodNames: {
     GET_TOTAL_KAI_AMOUNTS_IN: string;
     ADD_LIQUIDITY: string;
     ADD_LIQUIDITY_KAI: string;
-    ADD_LIQUIDITY_SUPPORTING_FEE: string;
+    REMOVE_LIQUIDITY_KAI_SUPPORTING_FEE: string;
     REMOVE_LIQUIDITY: string;
     REMOVE_LIQUIDITY_KAI: string;
     SWAP_EXACT_TOKENS_FOR_TOKENS: string;

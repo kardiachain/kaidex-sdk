@@ -3009,7 +3009,7 @@ var methodNames = {
   GET_TOTAL_KAI_AMOUNTS_IN: 'getTotalKAIAmountsIn',
   ADD_LIQUIDITY: 'addLiquidity',
   ADD_LIQUIDITY_KAI: 'addLiquidityKAI',
-  ADD_LIQUIDITY_SUPPORTING_FEE: 'swapExactTokensForTokensSupportingFeeOnTransferTokens',
+  REMOVE_LIQUIDITY_KAI_SUPPORTING_FEE: 'removeLiquidityKAISupportingFeeOnTransferTokens',
   REMOVE_LIQUIDITY: 'removeLiquidity',
   REMOVE_LIQUIDITY_KAI: 'removeLiquidityKAI',
   SWAP_EXACT_TOKENS_FOR_TOKENS: 'swapExactTokensForTokens',
