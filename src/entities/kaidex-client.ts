@@ -5,8 +5,6 @@ import { ONE, Utils, ZERO, _10000, _9975 } from '../utils';
 import { Fraction } from './fraction';
 import { SMCParams, Token, InputParams, InputType } from '../types';
 
-const BOSS_DOGE_ADDRESS = '0x5995F16246DfA676A44B8bD7E751C1226093dcd7'
-
 export class KaidexClient extends KaidexService {
   getPair = (tokenA: string, tokenB: string): Promise<string> =>
     this.factory.getPair(tokenA, tokenB);
@@ -124,11 +122,8 @@ export class KaidexClient extends KaidexService {
         deadlineInMilliseconds,
       } = await this.transformRemoveLiquidityKAIParams(params);
 
-      const methodName = (inputToken.tokenAddress === BOSS_DOGE_ADDRESS || outputToken.tokenAddress === BOSS_DOGE_ADDRESS) ?
-          methodNames.REMOVE_LIQUIDITY_KAI : methodNames.ADD_LIQUIDITY_SUPPORTING_FEE
-
       return {
-        methodName,
+        methodName: methodNames.REMOVE_LIQUIDITY_KAI,
         args: [
           tokenAddress,
           liquidity,
