@@ -3998,7 +3998,7 @@ var KaidexClient = /*#__PURE__*/function (_KaidexService) {
                 _walletAddress2 = _yield$_this$transfor.walletAddress;
                 _deadlineInMilliseconds2 = _yield$_this$transfor.deadlineInMilliseconds;
                 return _context2.abrupt("return", {
-                  methodName: methodNames.REMOVE_LIQUIDITY_KAI,
+                  methodName: params.feeOnTransfer ? methodNames.REMOVE_LIQUIDITY_KAI_SUPPORTING_FEE : methodNames.REMOVE_LIQUIDITY_KAI,
                   args: [tokenAddress, _liquidity, amountTokenMin, amountKAIMin, _walletAddress2, _deadlineInMilliseconds2]
                 });
 
@@ -4047,7 +4047,7 @@ var KaidexClient = /*#__PURE__*/function (_KaidexService) {
 
       switch (inputType) {
         case exports.InputType.EXACT_IN:
-          amountDec = Utils.cellValue(amount, inputToken.decimals); // Get amount 
+          amountDec = Utils.cellValue(amount, inputToken.decimals); // Get amount
 
           amountOutDec = _this.getOutputAmount(amountDec, reserveIn, reserveOut);
           decimals = outputToken.decimals;

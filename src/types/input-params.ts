@@ -43,6 +43,7 @@ export declare namespace InputParams {
     walletAddress: string;
     slippageTolerance: string | number;
     txDeadline: number;
+    feeOnTransfer?: boolean
   }
 
   interface MarketSwap {

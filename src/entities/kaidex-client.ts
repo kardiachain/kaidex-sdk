@@ -123,7 +123,7 @@ export class KaidexClient extends KaidexService {
       } = await this.transformRemoveLiquidityKAIParams(params);
 
       return {
-        methodName: methodNames.REMOVE_LIQUIDITY_KAI,
+        methodName: params.feeOnTransfer ? methodNames.REMOVE_LIQUIDITY_KAI_SUPPORTING_FEE : methodNames.REMOVE_LIQUIDITY_KAI,
         args: [
           tokenAddress,
           liquidity,
@@ -169,14 +169,14 @@ export class KaidexClient extends KaidexService {
   }: InputParams.CalculateOutputAmount): string => {
     if (!amount || !inputToken || !outputToken)
       throw new Error('Params input error.');
-      
+
     let amountDec;
     let amountOutDec = '';
     let decimals;
     switch (inputType) {
       case InputType.EXACT_IN:
         amountDec = Utils.cellValue(amount, inputToken.decimals);
-        // Get amount 
+        // Get amount
         amountOutDec = this.getOutputAmount(amountDec, reserveIn, reserveOut)
         decimals = outputToken.decimals;
         break;
