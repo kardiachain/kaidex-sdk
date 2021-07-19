@@ -4249,13 +4249,20 @@ var KaidexClient = /*#__PURE__*/function (_KaidexService) {
 
       var kaiIn = _this.isKAI(inputToken.tokenAddress);
 
+      var kaiOut = _this.isKAI(outputToken.tokenAddress);
+
       var swapParams;
 
       if (kaiIn) {
         swapParams = {
           methodName: methodNames.ORDER_INPUT_KAI,
-          args: [outputTokenAddr, amountOutDec, inputType, tradeType],
+          args: [outputTokenAddr, amountOutDec, exports.InputType.EXACT_IN, tradeType],
           amount: amountInDec
+        };
+      } else if (kaiOut) {
+        swapParams = {
+          methodName: methodNames.ORDER_INPUT_TOKENS,
+          args: [inputTokenAddr, amountInDec, outputTokenAddr, amountOutDec, exports.InputType.EXACT_OUT, tradeType]
         };
       } else {
         swapParams = {
@@ -4270,7 +4277,7 @@ var KaidexClient = /*#__PURE__*/function (_KaidexService) {
     _this.cancelLimitOrder = function (_ref10) {
       var pairAddr = _ref10.pairAddr,
           orderID = _ref10.orderID;
-      if (!pairAddr || !orderID) throw new Error('Params input error.');
+      if (!pairAddr || orderID === undefined) throw new Error('Params input error.');
       return {
         methodName: methodNames.CANCEL_ORDER,
         args: [pairAddr, orderID]

@@ -387,12 +387,25 @@ export class KaidexClient extends KaidexService {
     const amountInDec = Utils.cellValue(amountIn, inputTokenDec);
     const amountOutDec = Utils.cellValue(amountOut, outputTokenDec);
     const kaiIn = this.isKAI(inputToken.tokenAddress);
+    const kaiOut = this.isKAI(outputToken.tokenAddress);
     let swapParams: SMCParams.CallParams;
     if (kaiIn) {
       swapParams = {
         methodName: methodNames.ORDER_INPUT_KAI,
-        args: [outputTokenAddr, amountOutDec, inputType, tradeType],
+        args: [outputTokenAddr, amountOutDec, InputType.EXACT_IN, tradeType],
         amount: amountInDec,
+      };
+    } else if (kaiOut) {
+      swapParams = {
+        methodName: methodNames.ORDER_INPUT_TOKENS,
+        args: [
+          inputTokenAddr,
+          amountInDec,
+          outputTokenAddr,
+          amountOutDec,
+          InputType.EXACT_OUT,
+          tradeType,
+        ],
       };
     } else {
       swapParams = {
@@ -414,7 +427,7 @@ export class KaidexClient extends KaidexService {
     pairAddr,
     orderID,
   }: InputParams.CancelOrder): SMCParams.CallParams => {
-    if (!pairAddr || !orderID) throw new Error('Params input error.');
+    if (!pairAddr || orderID === undefined) throw new Error('Params input error.');
     return {
       methodName: methodNames.CANCEL_ORDER,
       args: [pairAddr, orderID],
