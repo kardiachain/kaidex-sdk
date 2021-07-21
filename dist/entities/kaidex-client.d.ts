@@ -22,6 +22,6 @@ export declare class KaidexClient extends KaidexService {
         rateBA: number;
     }>;
     marketSwapCallParameters: ({ amountIn, amountOut, inputToken, outputToken, addressTo, inputType, txDeadline, slippageTolerance, feeOnTransfer }: InputParams.MarketSwap) => SMCParams.CallParams;
-    limitOrderCallParameters: ({ amountIn, amountOut, inputToken, outputToken, inputType, tradeType, }: InputParams.LimitOrder) => SMCParams.CallParams;
-    cancelLimitOrder: ({ pairAddr, orderID, }: InputParams.CancelOrder) => SMCParams.CallParams;
+    limitOrderCallParameters: ({ amountIn, amountOut, inputToken, outputToken, inputType, tradeType, orderKAIFee, }: InputParams.LimitOrder) => SMCParams.CallParams;
+    cancelLimitOrder: ({ orderID, }: InputParams.CancelOrder) => SMCParams.CallParams;
 }

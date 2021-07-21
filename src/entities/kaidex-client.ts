@@ -373,6 +373,7 @@ export class KaidexClient extends KaidexService {
     outputToken,
     inputType,
     tradeType,
+    orderKAIFee = 1,
   }: InputParams.LimitOrder): SMCParams.CallParams => {
     if (!amountIn || !amountOut || !inputToken || !outputToken)
       throw new Error('Params input error.');
@@ -386,6 +387,7 @@ export class KaidexClient extends KaidexService {
     } = outputToken;
     const amountInDec = Utils.cellValue(amountIn, inputTokenDec);
     const amountOutDec = Utils.cellValue(amountOut, outputTokenDec);
+    const orderKAIFeeDec = Utils.cellValue(orderKAIFee, 18);
     const kaiIn = this.isKAI(inputToken.tokenAddress);
     const kaiOut = this.isKAI(outputToken.tokenAddress);
     let swapParams: SMCParams.CallParams;
@@ -393,7 +395,7 @@ export class KaidexClient extends KaidexService {
       swapParams = {
         methodName: methodNames.ORDER_INPUT_KAI,
         args: [outputTokenAddr, amountOutDec, InputType.EXACT_IN, tradeType],
-        amount: amountInDec,
+        amount: (new Fraction(amountInDec)).add(new Fraction(orderKAIFeeDec)).toFixed() ,
       };
     } else if (kaiOut) {
       swapParams = {
@@ -406,6 +408,7 @@ export class KaidexClient extends KaidexService {
           InputType.EXACT_OUT,
           tradeType,
         ],
+        amount: orderKAIFeeDec
       };
     } else {
       swapParams = {
@@ -418,19 +421,19 @@ export class KaidexClient extends KaidexService {
           inputType,
           tradeType,
         ],
+        amount: orderKAIFeeDec
       };
     }
     return swapParams;
   };
 
   cancelLimitOrder = ({
-    pairAddr,
     orderID,
   }: InputParams.CancelOrder): SMCParams.CallParams => {
-    if (!pairAddr || orderID === undefined) throw new Error('Params input error.');
+    if (orderID === null || orderID === undefined) throw new Error('Params input error.');
     return {
       methodName: methodNames.CANCEL_ORDER,
-      args: [pairAddr, orderID],
+      args: [orderID],
     } as SMCParams.CallParams;
   };
 }

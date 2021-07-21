@@ -2420,12 +2420,6 @@ var LIMIT_ORDER = [
 			},
 			{
 				indexed: false,
-				internalType: "address",
-				name: "pair",
-				type: "address"
-			},
-			{
-				indexed: false,
 				internalType: "uint256",
 				name: "orderId",
 				type: "uint256"
@@ -2512,36 +2506,12 @@ var LIMIT_ORDER = [
 	{
 		anonymous: false,
 		inputs: [
-			{
-				indexed: true,
-				internalType: "address",
-				name: "trader",
-				type: "address"
-			},
-			{
-				indexed: false,
-				internalType: "string",
-				name: "reason",
-				type: "string"
-			}
-		],
-		name: "SwapFailed",
-		type: "event"
-	},
-	{
-		anonymous: false,
-		inputs: [
 		],
 		name: "Unpause",
 		type: "event"
 	},
 	{
 		inputs: [
-			{
-				internalType: "address",
-				name: "_pair",
-				type: "address"
-			},
 			{
 				internalType: "uint256",
 				name: "_orderId",
@@ -2570,16 +2540,49 @@ var LIMIT_ORDER = [
 	},
 	{
 		inputs: [
+		],
+		name: "fee",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [
 			{
 				internalType: "address",
 				name: "_pair",
 				type: "address"
+			},
+			{
+				internalType: "uint256",
+				name: "_orderId",
+				type: "uint256"
 			}
 		],
 		name: "fill",
 		outputs: [
 		],
 		stateMutability: "nonpayable",
+		type: "function"
+	},
+	{
+		inputs: [
+		],
+		name: "getBalance",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
 		type: "function"
 	},
 	{
@@ -2599,68 +2602,27 @@ var LIMIT_ORDER = [
 	{
 		inputs: [
 			{
-				internalType: "address",
-				name: "_pair",
-				type: "address"
+				internalType: "uint256",
+				name: "_orderId",
+				type: "uint256"
 			}
 		],
 		name: "getOrders",
 		outputs: [
 			{
-				components: [
-					{
-						internalType: "address",
-						name: "trader",
-						type: "address"
-					},
-					{
-						internalType: "enum Types.OrderType",
-						name: "orderType",
-						type: "uint8"
-					},
-					{
-						components: [
-							{
-								internalType: "address",
-								name: "token",
-								type: "address"
-							},
-							{
-								internalType: "uint256",
-								name: "amount",
-								type: "uint256"
-							}
-						],
-						internalType: "struct Types.TokenAmount",
-						name: "input",
-						type: "tuple"
-					},
-					{
-						components: [
-							{
-								internalType: "address",
-								name: "token",
-								type: "address"
-							},
-							{
-								internalType: "uint256",
-								name: "amount",
-								type: "uint256"
-							}
-						],
-						internalType: "struct Types.TokenAmount",
-						name: "output",
-						type: "tuple"
-					},
-					{
-						internalType: "uint256",
-						name: "orderId",
-						type: "uint256"
-					}
-				],
-				internalType: "struct Types.Order[]",
+				internalType: "address",
 				name: "",
-				type: "tuple[]"
+				type: "address"
+			},
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			},
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
 			}
 		],
 		stateMutability: "view",
@@ -2675,6 +2637,20 @@ var LIMIT_ORDER = [
 				internalType: "bool",
 				name: "",
 				type: "bool"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [
+		],
+		name: "orderId",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
 			}
 		],
 		stateMutability: "view",
@@ -2745,7 +2721,7 @@ var LIMIT_ORDER = [
 		name: "orderInputTokens",
 		outputs: [
 		],
-		stateMutability: "nonpayable",
+		stateMutability: "payable",
 		type: "function"
 	},
 	{
@@ -2792,11 +2768,6 @@ var LIMIT_ORDER = [
 	},
 	{
 		inputs: [
-			{
-				internalType: "address",
-				name: "",
-				type: "address"
-			},
 			{
 				internalType: "uint256",
 				name: "",
@@ -2869,6 +2840,20 @@ var LIMIT_ORDER = [
 	},
 	{
 		inputs: [
+			{
+				internalType: "uint256",
+				name: "_fee",
+				type: "uint256"
+			}
+		],
+		name: "setFee",
+		outputs: [
+		],
+		stateMutability: "nonpayable",
+		type: "function"
+	},
+	{
+		inputs: [
 		],
 		name: "swap",
 		outputs: [
@@ -2897,76 +2882,6 @@ var LIMIT_ORDER = [
 	},
 	{
 		inputs: [
-			{
-				components: [
-					{
-						internalType: "address",
-						name: "trader",
-						type: "address"
-					},
-					{
-						internalType: "enum Types.OrderType",
-						name: "orderType",
-						type: "uint8"
-					},
-					{
-						components: [
-							{
-								internalType: "address",
-								name: "token",
-								type: "address"
-							},
-							{
-								internalType: "uint256",
-								name: "amount",
-								type: "uint256"
-							}
-						],
-						internalType: "struct Types.TokenAmount",
-						name: "input",
-						type: "tuple"
-					},
-					{
-						components: [
-							{
-								internalType: "address",
-								name: "token",
-								type: "address"
-							},
-							{
-								internalType: "uint256",
-								name: "amount",
-								type: "uint256"
-							}
-						],
-						internalType: "struct Types.TokenAmount",
-						name: "output",
-						type: "tuple"
-					},
-					{
-						internalType: "uint256",
-						name: "orderId",
-						type: "uint256"
-					}
-				],
-				internalType: "struct Types.Order",
-				name: "_order",
-				type: "tuple"
-			},
-			{
-				internalType: "address",
-				name: "_pair",
-				type: "address"
-			}
-		],
-		name: "trySwap",
-		outputs: [
-		],
-		stateMutability: "nonpayable",
-		type: "function"
-	},
-	{
-		inputs: [
 		],
 		name: "unpause",
 		outputs: [
@@ -2975,6 +2890,15 @@ var LIMIT_ORDER = [
 				name: "",
 				type: "bool"
 			}
+		],
+		stateMutability: "nonpayable",
+		type: "function"
+	},
+	{
+		inputs: [
+		],
+		name: "withdrawFee",
+		outputs: [
 		],
 		stateMutability: "nonpayable",
 		type: "function"
@@ -4238,7 +4162,9 @@ var KaidexClient = /*#__PURE__*/function (_KaidexService) {
           inputToken = _ref9.inputToken,
           outputToken = _ref9.outputToken,
           inputType = _ref9.inputType,
-          tradeType = _ref9.tradeType;
+          tradeType = _ref9.tradeType,
+          _ref9$orderKAIFee = _ref9.orderKAIFee,
+          orderKAIFee = _ref9$orderKAIFee === void 0 ? 1 : _ref9$orderKAIFee;
       if (!amountIn || !amountOut || !inputToken || !outputToken) throw new Error('Params input error.');
       var inputTokenAddr = inputToken.tokenAddress,
           inputTokenDec = inputToken.decimals;
@@ -4246,6 +4172,7 @@ var KaidexClient = /*#__PURE__*/function (_KaidexService) {
           outputTokenDec = outputToken.decimals;
       var amountInDec = Utils.cellValue(amountIn, inputTokenDec);
       var amountOutDec = Utils.cellValue(amountOut, outputTokenDec);
+      var orderKAIFeeDec = Utils.cellValue(orderKAIFee, 18);
 
       var kaiIn = _this.isKAI(inputToken.tokenAddress);
 
@@ -4257,17 +4184,19 @@ var KaidexClient = /*#__PURE__*/function (_KaidexService) {
         swapParams = {
           methodName: methodNames.ORDER_INPUT_KAI,
           args: [outputTokenAddr, amountOutDec, exports.InputType.EXACT_IN, tradeType],
-          amount: amountInDec
+          amount: new Fraction(amountInDec).add(new Fraction(orderKAIFeeDec)).toFixed()
         };
       } else if (kaiOut) {
         swapParams = {
           methodName: methodNames.ORDER_INPUT_TOKENS,
-          args: [inputTokenAddr, amountInDec, outputTokenAddr, amountOutDec, exports.InputType.EXACT_OUT, tradeType]
+          args: [inputTokenAddr, amountInDec, outputTokenAddr, amountOutDec, exports.InputType.EXACT_OUT, tradeType],
+          amount: orderKAIFeeDec
         };
       } else {
         swapParams = {
           methodName: methodNames.ORDER_INPUT_TOKENS,
-          args: [inputTokenAddr, amountInDec, outputTokenAddr, amountOutDec, inputType, tradeType]
+          args: [inputTokenAddr, amountInDec, outputTokenAddr, amountOutDec, inputType, tradeType],
+          amount: orderKAIFeeDec
         };
       }
 
@@ -4275,12 +4204,11 @@ var KaidexClient = /*#__PURE__*/function (_KaidexService) {
     };
 
     _this.cancelLimitOrder = function (_ref10) {
-      var pairAddr = _ref10.pairAddr,
-          orderID = _ref10.orderID;
-      if (!pairAddr || orderID === undefined) throw new Error('Params input error.');
+      var orderID = _ref10.orderID;
+      if (orderID === null || orderID === undefined) throw new Error('Params input error.');
       return {
         methodName: methodNames.CANCEL_ORDER,
-        args: [pairAddr, orderID]
+        args: [orderID]
       };
     };
 

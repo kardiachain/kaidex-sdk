@@ -65,10 +65,10 @@ export declare namespace InputParams {
     outputToken: Token;
     tradeType: TradeType;
     inputType: InputType;
+    orderKAIFee?: number;
   }
 
   interface CancelOrder {
-    pairAddr: string;
     orderID: number;
   }
 }
